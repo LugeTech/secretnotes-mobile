@@ -23,6 +23,7 @@ const MAPPING = {
   'sun.max.fill': 'wb-sunny',
   'moon.fill': 'dark-mode',
   'questionmark.circle.fill': 'help',
+  'xmark.circle.fill': 'cancel',
 } as IconMapping;
 
 /**

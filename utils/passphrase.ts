@@ -1,0 +1,34 @@
+export type PassphraseStrength = 'weak' | 'medium' | 'strong';
+
+const COMMON_PHRASES = [
+  'hello',
+  'test',
+  'public',
+  'password',
+  'demo',
+  '123',
+  'abc',
+  'temp',
+];
+
+export function getPassphraseStrength(passphrase: string): PassphraseStrength {
+  if (passphrase.length < 8) return 'weak';
+  if (passphrase.length < 16) return 'medium';
+  return 'strong';
+}
+
+export function isCommonPhrase(passphrase: string): boolean {
+  const lower = passphrase.toLowerCase();
+  return COMMON_PHRASES.some(phrase => lower.includes(phrase));
+}
+
+export function getPassphraseColor(strength: PassphraseStrength): string {
+  switch (strength) {
+    case 'weak':
+      return '#FF5252';
+    case 'medium':
+      return '#FF9800';
+    case 'strong':
+      return '#4CAF50';
+  }
+}

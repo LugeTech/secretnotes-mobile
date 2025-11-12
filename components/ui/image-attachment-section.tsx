@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, ViewStyle, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 
 import { ThemedText } from '@/components/themed-text';
@@ -21,19 +21,20 @@ export type ImageAttachmentSectionProps = {
   fileSize?: string;
   /** Thumbnail URI for the preview image */
   thumbnailUri?: string;
-  /** Optional press handler (UI only) */
+  /** Press handler - for preview mode opens viewer, for empty mode opens picker */
   onPress?: () => void;
-  /** Optional remove handler in preview mode (UI only) */
-  onRemove?: () => void;
+  /** Optional replace handler in preview mode */
+  onReplace?: () => void;
   /** Optional container style overrides */
   style?: ViewStyle;
   /** Optional test id */
   testID?: string;
+  /** Loading state */
+  isLoading?: boolean;
 };
 
 /**
- * UI-only image attachment section used below the note text area.
- * No pickers, uploads, or backend calls here—purely presentational.
+ * Image attachment section used below the note text area.
  */
 export default function ImageAttachmentSection({
   mode = 'empty',
@@ -42,48 +43,60 @@ export default function ImageAttachmentSection({
   fileSize,
   thumbnailUri,
   onPress,
-  onRemove,
+  onReplace,
   style,
   testID,
+  isLoading = false,
 }: ImageAttachmentSectionProps) {
   const borderColor = useThemeColor({}, 'icon');
   const textColor = useThemeColor({}, 'text');
 
+  if (isLoading) {
+    return (
+      <ThemedView style={[styles.emptyPlain, style]}>
+        <ActivityIndicator size="small" />
+        <ThemedText style={styles.emptyHint}>Loading image...</ThemedText>
+      </ThemedView>
+    );
+  }
+
   if (mode === 'preview') {
     const containerBase = appearance === 'plain' ? styles.previewPlain : styles.previewContainer;
     return (
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Attached image preview (UI only)"
-        onPress={onPress}
-        testID={testID}
-      >
-        <ThemedView style={[containerBase, appearance !== 'plain' ? { borderColor } : null, style]}>
+      <ThemedView style={[containerBase, appearance !== 'plain' ? { borderColor } : null, style]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="View full image"
+          onPress={onPress}
+          style={styles.thumbnailButton}
+        >
           <Image
             source={thumbnailUri || undefined}
             style={styles.thumbnail}
             contentFit="cover"
+            cachePolicy="none"
           />
-          <View style={styles.metaContainer}>
-            <ThemedText numberOfLines={1} style={styles.fileName}>
-              {fileName || 'attached-image'}
-            </ThemedText>
-            {!!fileSize && (
-              <ThemedText style={styles.fileSize}>{fileSize}</ThemedText>
-            )}
-          </View>
-          {onRemove ? (
-            <Pressable
-              style={styles.removeBtn}
-              accessibilityRole="button"
-              accessibilityLabel="Remove attachment (UI only)"
-              onPress={onRemove}
-            >
-              <ThemedText style={[styles.removeBtnText, { color: textColor }]}>×</ThemedText>
-            </Pressable>
-          ) : null}
-        </ThemedView>
-      </Pressable>
+        </Pressable>
+        <View style={styles.metaContainer}>
+          <ThemedText numberOfLines={1} style={styles.fileName}>
+            {fileName || 'attached-image'}
+          </ThemedText>
+          {!!fileSize && (
+            <ThemedText style={styles.fileSize}>{fileSize}</ThemedText>
+          )}
+        </View>
+        {onReplace && (
+          <Pressable
+            style={styles.replaceBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Replace image"
+            onPress={onReplace}
+            hitSlop={8}
+          >
+            <ThemedText style={[styles.replaceBtnText, { color: textColor }]}>↻</ThemedText>
+          </Pressable>
+        )}
+      </ThemedView>
     );
   }
 
@@ -98,13 +111,13 @@ export default function ImageAttachmentSection({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Attach image (UI only)"
+      accessibilityLabel="Attach image"
       onPress={onPress}
       testID={testID}
     >
       <ThemedView style={[emptyStyle as any, style]}>
-        <ThemedText style={styles.emptyTitle}>Attach image (UI only)</ThemedText>
-        <ThemedText style={styles.emptyHint}>No file picker yet</ThemedText>
+        <ThemedText style={styles.emptyTitle}>Attach image</ThemedText>
+        <ThemedText style={styles.emptyHint}>Tap to select from gallery</ThemedText>
       </ThemedView>
     </Pressable>
   );
@@ -165,6 +178,9 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 16,
   },
+  thumbnailButton: {
+    borderRadius: 8,
+  },
   thumbnail: {
     width: 64,
     height: 64,
@@ -182,7 +198,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginTop: 4,
   },
-  removeBtn: {
+  replaceBtn: {
     width: 28,
     height: 28,
     borderRadius: 14,
@@ -190,8 +206,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
   },
-  removeBtnText: {
-    fontSize: 18,
-    lineHeight: 18,
+  replaceBtnText: {
+    fontSize: 20,
+    lineHeight: 20,
   },
 });

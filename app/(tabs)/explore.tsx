@@ -32,21 +32,33 @@ export default function TabTwoScreen() {
         </ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.section}>
+      <ThemedView 
+        style={styles.section}
+        lightColor="rgba(230, 220, 240, 0.5)"
+        darkColor="rgba(100, 90, 120, 0.2)"
+      >
         <ThemedText style={styles.sectionTitle}>When is this useful?</ThemedText>
         <ThemedText style={styles.bullet}>• Capture thoughts you don’t want tied to an account or synced profile.</ThemedText>
         <ThemedText style={styles.bullet}>• Share a simple passphrase so two people see the same private space instantly.</ThemedText>
         <ThemedText style={styles.bullet}>• Spin up “burner” spaces for plans, drafts, or photos you can walk away from by forgetting the phrase.</ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.section}>
+      <ThemedView 
+        style={styles.section}
+        lightColor="rgba(220, 240, 230, 0.5)"
+        darkColor="rgba(80, 110, 100, 0.2)"
+      >
         <ThemedText style={styles.sectionTitle}>What makes it different?</ThemedText>
         <ThemedText style={styles.bullet}>• Notes aren’t public URLs: only this site/app shows in history, not what you wrote.</ThemedText>
         <ThemedText style={styles.bullet}>• Your passphrase is the key: change it, and you’re in a completely different space.</ThemedText>
         <ThemedText style={styles.bullet}>• One passphrase = one focused note + one image: clean, minimal, easy to remember.</ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.section}>
+      <ThemedView 
+        style={styles.section}
+        lightColor="rgba(245, 230, 220, 0.5)"
+        darkColor="rgba(120, 100, 90, 0.2)"
+      >
         <ThemedText style={styles.sectionTitle}>How it works</ThemedText>
         <ThemedText style={styles.bullet}>• Type a passphrase (3+ characters) to open its note.</ThemedText>
         <ThemedText style={styles.bullet}>• After you pause, the app fetches or creates that note in the background.</ThemedText>
@@ -54,7 +66,11 @@ export default function TabTwoScreen() {
         <ThemedText style={styles.bullet}>• Add one image to keep an important screenshot, document, or photo with the note.</ThemedText>
        </ThemedView>
  
-       <ThemedView style={styles.section}>
+       <ThemedView 
+         style={styles.section}
+         lightColor="rgba(220, 230, 245, 0.5)"
+         darkColor="rgba(80, 90, 120, 0.2)"
+       >
          <ThemedText style={styles.sectionTitle}>Why it’s private by design</ThemedText>
          <ThemedText style={styles.bullet}>Built so even we can’t read your private notes.</ThemedText>
          <ThemedText style={styles.bullet}>• AES-256-GCM encryption for notes and images before they hit the database.</ThemedText>
@@ -63,7 +79,11 @@ export default function TabTwoScreen() {
          <ThemedText style={styles.bullet}>• Strong, unique passphrases = private vaults; obvious phrases behave like open, shared boards.</ThemedText>
        </ThemedView>
  
-       <ThemedView style={styles.section}>
+       <ThemedView 
+         style={styles.section}
+         lightColor="rgba(240, 220, 230, 0.5)"
+         darkColor="rgba(120, 90, 100, 0.2)"
+       >
          <ThemedText
            style={styles.link}
            onPress={() => router.push('/facts-for-nerds')}
@@ -92,7 +112,6 @@ const styles = StyleSheet.create({
      marginTop: 18,
      padding: 14,
      borderRadius: 10,
-     backgroundColor: 'rgba(0,0,0,0.03)',
    },
    sectionTitle: {
      fontSize: 17,

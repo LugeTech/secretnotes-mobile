@@ -28,7 +28,7 @@ export default function TabTwoScreen() {
           style={{
             fontFamily: Fonts.rounded,
           }}>
-          Tips
+          About
         </ThemedText>
       </ThemedView>
 
@@ -92,6 +92,12 @@ export default function TabTwoScreen() {
          </ThemedText>
        </ThemedView>
 
+       <ThemedView style={styles.footer}>
+         <ThemedText style={styles.madeBy}>
+           Made by <ExternalLink href="https://www.lugetech.com"><ThemedText style={styles.lugetech}>Lugetech</ThemedText></ExternalLink>
+         </ThemedText>
+       </ThemedView>
+
     </ParallaxScrollView>
   );
 }
@@ -122,5 +128,19 @@ const styles = StyleSheet.create({
      fontSize: 15,
      lineHeight: 22,
      marginBottom: 3,
+   },
+   footer: {
+     marginTop: 24,
+     marginBottom: 20,
+     alignItems: 'center',
+   },
+   madeBy: {
+     fontSize: 14,
+     opacity: 0.7,
+   },
+   lugetech: {
+     fontSize: 14,
+     fontWeight: '600',
+     textDecorationLine: 'underline',
    },
 });

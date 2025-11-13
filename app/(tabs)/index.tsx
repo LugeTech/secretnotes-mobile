@@ -192,7 +192,7 @@ export default function HomeScreen() {
               onChangeText={setNoteContent}
                 placeholder={
                  passphrase.length < 3
-                   ? 'Now you can add or replace an image with every note!\n\nUse a simple, fun passphrase for a public board others might stumble into. Use a long, unique passphrase for a private, encrypted note only you can open.'
+                   ? 'Now you can add or replace an image with every note!\n\nUse a simple, fun passphrase for a public board others might stumble into. Use a long, unique passphrase for a private, encrypted note only you can open.\n\nDownload the mobile app:\niOS: https://apps.apple.com/secertnote\nAndroid: https://play.google.com/store/secertnote'
                    : 'Start typing your note...'
                }
               editable={!isSavingNote && passphrase.length >= 3}

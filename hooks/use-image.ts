@@ -1,8 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useNoteContext } from '@/components/note/note-provider';
 import { uploadImage, fetchImage, deleteImage, handleApiError } from '@/utils/api-client';
+import { compressImage, formatFileSize, getCompressionSummary } from '@/utils/image-compression';
 import { useNote } from './use-note';
 
 export function useImage() {
@@ -16,6 +17,8 @@ export function useImage() {
     setIsUploadingImage,
     setError,
   } = useNoteContext();
+
+  const [compressionProgress, setCompressionProgress] = useState<string | null>(null);
 
   const { loadNote } = useNote();
 
@@ -46,7 +49,7 @@ export function useImage() {
     }
 
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (!permissionResult.granted) {
       Alert.alert('Permission Required', 'Camera roll permission is required to attach images.');
       return;
@@ -55,7 +58,7 @@ export function useImage() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      quality: 0.8,
+      quality: 1.0, // Get highest quality for better compression results
       base64: false,
     });
 
@@ -64,38 +67,74 @@ export function useImage() {
     }
 
     const asset = result.assets[0];
-    
-    const MAX_SIZE = 10 * 1024 * 1024;
-    if (asset.fileSize && asset.fileSize > MAX_SIZE) {
-      Alert.alert(
-        'Image Too Large',
-        `Image size is ${(asset.fileSize / (1024 * 1024)).toFixed(1)}MB. Maximum size is 10MB. Please select a smaller image.`
-      );
-      return;
-    }
 
     setIsUploadingImage(true);
     setError(null);
+    setCompressionProgress('Preparing image...');
 
     try {
-      const metadata = await uploadImage(
-        passphrase,
+      // Show original file size
+      if (asset.fileSize) {
+        setCompressionProgress(`Original size: ${formatFileSize(asset.fileSize)}`);
+      }
+
+      // Compress the image
+      setCompressionProgress('Compressing image...');
+      const compressionResult = await compressImage(
         asset.uri,
-        asset.fileName,
+        {
+          maxWidth: 1920,
+          maxHeight: 1920,
+          quality: 0.8,
+          compressOnlyIfLargerThan: 2 * 1024 * 1024, // 2MB
+        },
         asset.mimeType
       );
-      
+
+      // Show compression results
+      if (compressionResult.compressed) {
+        setCompressionProgress(getCompressionSummary(compressionResult));
+        console.log('Image compression completed:', compressionResult);
+      } else {
+        setCompressionProgress('Image already optimized');
+      }
+
+      // Small delay to show compression status
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setCompressionProgress('Uploading image...');
+      const metadata = await uploadImage(
+        passphrase,
+        compressionResult.uri,
+        asset.fileName || 'photo.jpg',
+        compressionResult.format
+      );
+
       setImageMetadata(metadata);
       await loadNote();
       await loadImage();
-      
-      Alert.alert('Success', 'Image uploaded successfully');
+
+      const successMessage = compressionResult.compressed
+        ? `Image uploaded successfully\n${getCompressionSummary(compressionResult)}`
+        : 'Image uploaded successfully';
+
+      Alert.alert('Success', successMessage);
     } catch (error) {
       const message = handleApiError(error);
       setError(message);
-      Alert.alert('Error Uploading Image', message);
+
+      // Show more detailed error for compression issues
+      if (message.includes('exceeds maximum allowed size')) {
+        Alert.alert(
+          'Image Too Large',
+          'The selected image is too large to process. Please choose a smaller image or try a different format.'
+        );
+      } else {
+        Alert.alert('Error', message);
+      }
     } finally {
       setIsUploadingImage(false);
+      setCompressionProgress(null);
     }
   }, [passphrase, setImageMetadata, setIsUploadingImage, setError, loadNote, loadImage]);
 
@@ -145,5 +184,6 @@ export function useImage() {
     loadImage,
     pickAndUploadImage,
     removeImage,
+    compressionProgress,
   };
 }

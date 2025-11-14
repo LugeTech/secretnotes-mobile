@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, TextInput, View, ActivityIndicator, Pressable } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -14,9 +14,12 @@ import { SaveIndicator } from '@/components/note/save-indicator';
 import { formatFileSize } from '@/utils/format';
 import { getPassphraseStrength, isCommonPhrase, getPassphraseColor } from '@/utils/passphrase';
 import { ImageViewer } from '@/components/image/image-viewer';
+import { WelcomeScreen } from '@/components/welcome-screen';
 
 export default function HomeScreen() {
   const iconColor = useThemeColor({}, 'text');
+  const noteInputRef = useRef<TextInput>(null);
+  const [isThumbnailBlurred, setIsThumbnailBlurred] = useState(true);
   
   const {
     passphrase,
@@ -27,7 +30,9 @@ export default function HomeScreen() {
     setNoteContent,
     note,
     imageUri,
+    setImageUri,
     imageMetadata,
+    setImageMetadata,
     isLoadingNote,
     isSavingNote,
     isLoadingImage,
@@ -42,14 +47,26 @@ export default function HomeScreen() {
   } = useNoteContext();
 
   const { loadNote, updateNote } = useNote();
-  const { loadImage, pickAndUploadImage } = useImage();
+  const { loadImage, pickAndUploadImage, compressionProgress } = useImage();
 
   useAutoSave(noteContent, passphrase, updateNote, note !== null);
 
-  const handleManualSave = async () => {
-    if (hasUnsavedChanges && passphrase.length >= 3) {
-      await updateNote(noteContent);
+  const DEFAULT_WELCOME_MESSAGE = 'Welcome to your new secure note!';
+
+  const handleNoteFocus = () => {
+    if (noteContent === DEFAULT_WELCOME_MESSAGE) {
+      noteInputRef.current?.setNativeProps({ selection: { start: 0, end: noteContent.length } });
     }
+  };
+
+  const handleImagePress = () => {
+    setIsThumbnailBlurred(false); // Clear blur when opening viewer
+    setIsImageViewerOpen(true);
+  };
+
+  const handleViewerClose = () => {
+    setIsImageViewerOpen(false);
+    setIsThumbnailBlurred(true); // Restore blur when closing viewer
   };
 
   const passphraseStrength = passphrase.length >= 3 ? getPassphraseStrength(passphrase) : null;
@@ -67,6 +84,21 @@ export default function HomeScreen() {
 
     return () => clearTimeout(handle);
   }, [passphrase, loadNote, clearNote]);
+
+  // Clear any previously loaded image when switching passphrase or notes
+  useEffect(() => {
+    setImageUri(null);
+    setImageMetadata(null);
+    setIsImageViewerOpen(false);
+  }, [passphrase, setImageUri, setImageMetadata, setIsImageViewerOpen]);
+
+  useEffect(() => {
+    if (note?.id) {
+      setImageUri(null);
+      setImageMetadata(null);
+      setIsImageViewerOpen(false);
+    }
+  }, [note?.id, setImageUri, setImageMetadata, setIsImageViewerOpen]);
 
   useEffect(() => {
     if (note?.hasImage && !imageUri) {
@@ -87,6 +119,14 @@ export default function HomeScreen() {
           >
             <IconSymbol name="xmark.circle.fill" size={20} color="#D32F2F" />
           </Pressable>
+        </ThemedView>
+      )}
+
+      {/* Compression progress banner */}
+      {compressionProgress && (
+        <ThemedView style={styles.progressBanner}>
+          <ActivityIndicator size="small" color="#1976D2" />
+          <ThemedText style={styles.progressText}>{compressionProgress}</ThemedText>
         </ThemedView>
       )}
       
@@ -166,36 +206,27 @@ export default function HomeScreen() {
                   lastSavedAt={lastSavedAt}
                 />
               )}
-              {note && hasUnsavedChanges && !isSavingNote && (
-                <Pressable
-                  onPress={handleManualSave}
-                  style={styles.saveButton}
-                  hitSlop={8}
-                >
-                  <ThemedText style={styles.saveButtonText}>Save Now</ThemedText>
-                </Pressable>
-              )}
             </View>
           </View>
         </ThemedView>
 
         {/* Welcome + Note Text Area (75%) */}
         <ThemedView style={styles.noteSection}>
-          {isLoadingNote ? (
+          {passphrase.length < 3 ? (
+            <WelcomeScreen />
+          ) : isLoadingNote ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" />
               <ThemedText style={styles.loadingText}>Loading note...</ThemedText>
             </View>
           ) : (
             <TextInput
+              ref={noteInputRef}
               value={noteContent}
               onChangeText={setNoteContent}
-                placeholder={
-                 passphrase.length < 3
-                   ? 'Now you can add or replace an image with every note!\n\nUse a simple, fun passphrase for a public board others might stumble into. Use a long, unique passphrase for a private, encrypted note only you can open.\n\nDownload the mobile app:\niOS: https://apps.apple.com/secertnote\nAndroid: https://play.google.com/store/secertnote'
-                   : 'Start typing your note...'
-               }
-              editable={!isSavingNote && passphrase.length >= 3}
+              onFocus={handleNoteFocus}
+              placeholder="Start typing your note..."
+              editable={passphrase.length >= 3}
               multiline
               scrollEnabled
               style={styles.noteArea}
@@ -208,25 +239,46 @@ export default function HomeScreen() {
 
         {/* Image thumbnail preview - 10% at bottom */}
         <ThemedView style={styles.imageFlex}>
-          {note && imageUri ? (
-            <ImageAttachmentSection
-              mode="preview"
-              appearance="plain"
-              fileName={imageMetadata?.fileName || 'image.jpg'}
-              fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
-              thumbnailUri={imageUri}
-              onPress={() => setIsImageViewerOpen(true)}
-              onReplace={pickAndUploadImage}
-              isLoading={isLoadingImage || isUploadingImage}
-            />
-          ) : note ? (
-            <ImageAttachmentSection
-              mode="empty"
-              appearance="plain"
-              onPress={pickAndUploadImage}
-              isLoading={isLoadingImage || isUploadingImage}
-            />
-          ) : null}
+          <ThemedView style={styles.imageContainer}>
+            {note && note.hasImage && imageUri ? (
+              <ImageAttachmentSection
+                mode="preview"
+                appearance="plain"
+                fileName={imageMetadata?.fileName || 'image.jpg'}
+                fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
+                thumbnailUri={imageUri}
+                onPress={handleImagePress}
+                onReplace={pickAndUploadImage}
+                isLoading={isLoadingImage || isUploadingImage}
+                blur={isThumbnailBlurred}
+                blurRadius={8}
+              />
+            ) : note ? (
+              <ImageAttachmentSection
+                mode="empty"
+                appearance="plain"
+                onPress={pickAndUploadImage}
+                isLoading={isLoadingImage || isUploadingImage}
+              />
+            ) : null}
+
+            {/* Blur toggle button - bottom right */}
+            {note && note.hasImage && imageUri && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={isThumbnailBlurred ? 'Show thumbnail' : 'Hide thumbnail'}
+                onPress={() => setIsThumbnailBlurred(!isThumbnailBlurred)}
+                hitSlop={8}
+                style={styles.blurToggleBtn}
+              >
+                <IconSymbol
+                  name={isThumbnailBlurred ? 'eye.slash.fill' : 'eye.fill'}
+                  size={18}
+                  color={isThumbnailBlurred ? '#1976D2' : iconColor}
+                />
+              </Pressable>
+            )}
+          </ThemedView>
         </ThemedView>
       </ThemedView>
 
@@ -235,7 +287,7 @@ export default function HomeScreen() {
         visible={isImageViewerOpen}
         imageUri={imageUri}
         fileName={imageMetadata?.fileName}
-        onClose={() => setIsImageViewerOpen(false)}
+        onClose={handleViewerClose}
       />
     </ThemedView>
   );
@@ -264,6 +316,21 @@ const styles = StyleSheet.create({
   },
   errorClose: {
     padding: 4,
+  },
+  progressBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E3F2FD',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    gap: 8,
+  },
+  progressText: {
+    color: '#1976D2',
+    fontSize: 14,
+    fontWeight: '500',
   },
   bodyColumn: {
     flex: 1,
@@ -336,17 +403,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
   noteSection: {
     flex: 75,
     marginBottom: 8,
@@ -375,5 +431,22 @@ const styles = StyleSheet.create({
     flex: 10,
     justifyContent: 'center',
     alignItems: 'flex-start',
+  },
+  imageContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  blurToggleBtn: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
 });

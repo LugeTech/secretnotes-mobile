@@ -25,10 +25,10 @@ export function useAutoSave(
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(async () => {
+    timeoutRef.current = window.setTimeout(async () => {
       await onSave(content);
       previousContentRef.current = content;
-    }, AUTO_SAVE_DELAY_MS);
+    }, AUTO_SAVE_DELAY_MS) as unknown as NodeJS.Timeout;
 
     return () => {
       if (timeoutRef.current) {

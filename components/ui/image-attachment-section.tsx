@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 export type ImageAttachmentSectionProps = {
@@ -31,6 +32,10 @@ export type ImageAttachmentSectionProps = {
   testID?: string;
   /** Loading state */
   isLoading?: boolean;
+  /** Whether to apply blur effect to the thumbnail */
+  blur?: boolean;
+  /** Custom blur radius (default: 8) */
+  blurRadius?: number;
 };
 
 /**
@@ -47,6 +52,8 @@ export default function ImageAttachmentSection({
   style,
   testID,
   isLoading = false,
+  blur = false,
+  blurRadius = 8,
 }: ImageAttachmentSectionProps) {
   const borderColor = useThemeColor({}, 'icon');
   const textColor = useThemeColor({}, 'text');
@@ -75,6 +82,7 @@ export default function ImageAttachmentSection({
             style={styles.thumbnail}
             contentFit="cover"
             cachePolicy="none"
+            blurRadius={blur ? blurRadius : 0}
           />
         </Pressable>
         <View style={styles.metaContainer}>
@@ -93,7 +101,8 @@ export default function ImageAttachmentSection({
             onPress={onReplace}
             hitSlop={8}
           >
-            <ThemedText style={[styles.replaceBtnText, { color: textColor }]}>↻</ThemedText>
+            <IconSymbol name="plus" size={14} color={textColor} />
+            <ThemedText style={[styles.replaceBtnText, { color: textColor }]}>Replace</ThemedText>
           </Pressable>
         )}
       </ThemedView>
@@ -169,7 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   previewPlain: {
-    borderWidth: 0,
+    borderWidth: 1,
     borderRadius: 12,
     padding: 8,
     minHeight: 72,
@@ -177,6 +186,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginBottom: 16,
+    backgroundColor: 'rgba(25, 118, 210, 0.04)',
+    borderColor: 'rgba(25, 118, 210, 0.15)',
   },
   thumbnailButton: {
     borderRadius: 8,
@@ -186,6 +197,14 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 8,
     backgroundColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   metaContainer: {
     flex: 1,
@@ -199,15 +218,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   replaceBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     borderWidth: 1,
+    gap: 6,
   },
   replaceBtnText: {
-    fontSize: 20,
-    lineHeight: 20,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

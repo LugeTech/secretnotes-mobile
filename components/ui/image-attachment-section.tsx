@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View, ViewStyle, ActivityIndicator } from 'react-native';
+import { Pressable, StyleSheet, View, ViewStyle, ActivityIndicator, Platform } from 'react-native';
 import { Image } from 'expo-image';
 
 import { ThemedText } from '@/components/themed-text';
@@ -34,7 +34,7 @@ export type ImageAttachmentSectionProps = {
   isLoading?: boolean;
   /** Whether to apply blur effect to the thumbnail */
   blur?: boolean;
-  /** Custom blur radius (default: 8) */
+  /** Custom blur radius (default: 20) */
   blurRadius?: number;
 };
 
@@ -53,7 +53,7 @@ export default function ImageAttachmentSection({
   testID,
   isLoading = false,
   blur = false,
-  blurRadius = 8,
+  blurRadius = 20,
 }: ImageAttachmentSectionProps) {
   const borderColor = useThemeColor({}, 'icon');
   const textColor = useThemeColor({}, 'text');
@@ -77,13 +77,24 @@ export default function ImageAttachmentSection({
           onPress={onPress}
           style={styles.thumbnailButton}
         >
-          <Image
-            source={thumbnailUri || undefined}
-            style={styles.thumbnail}
-            contentFit="cover"
-            cachePolicy="none"
-            blurRadius={blur ? blurRadius : 0}
-          />
+          <View style={styles.thumbnailWrapper}>
+            <Image
+              source={thumbnailUri || undefined}
+              style={styles.thumbnail}
+              contentFit="cover"
+              cachePolicy="none"
+              blurRadius={blur ? blurRadius : 0}
+            />
+            {blur && (
+              <View
+                pointerEvents="none"
+                style={[
+                  styles.thumbnailBlurOverlay,
+                  Platform.OS !== 'web' && styles.nativeThumbnailBlurOverlay,
+                ]}
+              />
+            )}
+          </View>
         </Pressable>
         <View style={styles.metaContainer}>
           <ThemedText numberOfLines={1} style={styles.fileName}>
@@ -192,6 +203,10 @@ const styles = StyleSheet.create({
   thumbnailButton: {
     borderRadius: 8,
   },
+  thumbnailWrapper: {
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
   thumbnail: {
     width: 64,
     height: 64,
@@ -205,6 +220,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
+  },
+  thumbnailBlurOverlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+  },
+  nativeThumbnailBlurOverlay: {
+    backgroundColor: 'rgba(15, 23, 42, 0.7)',
   },
   metaContainer: {
     flex: 1,

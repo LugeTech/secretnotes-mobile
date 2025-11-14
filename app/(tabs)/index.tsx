@@ -129,6 +129,12 @@ export default function HomeScreen() {
     }
   }, [note?.hasImage, imageUri, loadImage]);
 
+  useEffect(() => {
+    if (note?.hasImage && imageUri) {
+      setIsThumbnailBlurred(true);
+    }
+  }, [note?.id, imageUri, note?.hasImage, setIsThumbnailBlurred]);
+
   return (
     <ThemedView style={[styles.root, {
       paddingTop: insets.top + 32,
@@ -272,14 +278,14 @@ export default function HomeScreen() {
               <ImageAttachmentSection
                 mode="preview"
                 appearance="plain"
-                fileName={imageMetadata?.fileName || 'image.jpg'}
+                fileName={isThumbnailBlurred ? 'Image hidden' : 'Image'}
                 fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
                 thumbnailUri={imageUri}
                 onPress={handleImagePress}
                 onReplace={handleAddOrReplaceImage}
                 isLoading={isLoadingImage || isUploadingImage}
                 blur={isThumbnailBlurred}
-                blurRadius={8}
+                blurRadius={20}
               />
             ) : note ? (
               <ImageAttachmentSection
@@ -314,7 +320,7 @@ export default function HomeScreen() {
       <ImageViewer
         visible={isImageViewerOpen}
         imageUri={imageUri}
-        fileName={imageMetadata?.fileName}
+        fileName="Image"
         onClose={handleViewerClose}
       />
     </ThemedView>

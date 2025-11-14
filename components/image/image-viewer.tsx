@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import * as MediaLibrary from 'expo-media-library';
-import { documentDirectory, writeAsStringAsync, deleteAsync } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
@@ -38,15 +38,17 @@ export function ImageViewer({ visible, imageUri, fileName, onClose }: ImageViewe
       if (imageUri.startsWith('data:')) {
         const mimeMatch = imageUri.match(/data:image\/(\w+);base64,/);
         const fileExtension = mimeMatch ? mimeMatch[1] : 'jpg';
-        const tempFilePath = documentDirectory + `${fileName || 'image'}.${fileExtension}`;
         const base64Data = imageUri.split(';base64,')[1];
 
-        await writeAsStringAsync(tempFilePath, base64Data, {
-          encoding: 'base64',
-        });
+        const tempFile = new File(Paths.document, `${fileName || 'image'}.${fileExtension}`);
+        
+        // Convert base64 to Uint8Array and write to file
+        const binaryString = atob(base64Data);
+        const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+        tempFile.write(bytes);
 
-        const asset = await MediaLibrary.createAssetAsync(tempFilePath);
-        await deleteAsync(tempFilePath, { idempotent: true });
+        const asset = await MediaLibrary.createAssetAsync(tempFile.uri);
+        tempFile.delete();
         
         await MediaLibrary.createAlbumAsync('Secret Notes', asset, false).catch(() => {});
 

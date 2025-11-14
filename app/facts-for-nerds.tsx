@@ -1,34 +1,29 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
+import { Image } from 'expo-image';
 
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
 
 export default function FactsForNerdsScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={200}
-          color="#808080"
-          name="lock.shield.fill"
-          style={styles.headerImage}
+    <ThemedView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Image
+          source={require('@/assets/images/icon.png')}
+          style={styles.logo}
+          contentFit="contain"
         />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}
-        >
-          Facts for Nerds
-        </ThemedText>
-      </ThemedView>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText
+            type="title"
+            style={{
+              fontFamily: Fonts.rounded,
+            }}
+          >
+            Facts for Nerds
+          </ThemedText>
+        </ThemedView>
 
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Crypto at a glance</ThemedText>
@@ -58,19 +53,28 @@ export default function FactsForNerdsScreen() {
         <ThemedText style={styles.bullet}>• Public/simple phrases act like shared boards anyone can stumble into.</ThemedText>
         <ThemedText style={styles.emphasis}>Lose your passphrase? There&apos;s no recovery. That&apos;s by design.</ThemedText>
       </ThemedView>
-    </ParallaxScrollView>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    bottom: -80,
-    left: -20,
-    position: 'absolute',
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 32,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 24,
   },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+    justifyContent: 'center',
     marginBottom: 8,
   },
   section: {

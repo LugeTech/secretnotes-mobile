@@ -1,9 +1,8 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, ScrollView } from 'react-native';
 
 import { Collapsible } from '@/components/ui/collapsible';
 import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -12,25 +11,22 @@ import { router } from 'expo-router';
 
 export default function TabTwoScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={220}
-          color="#808080"
-          name="questionmark.circle.fill"
-          style={styles.headerImage}
+    <ThemedView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Image
+          source={require('@/assets/images/icon.png')}
+          style={styles.logo}
+          contentFit="contain"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          About
-        </ThemedText>
-      </ThemedView>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText
+            type="title"
+            style={{
+              fontFamily: Fonts.rounded,
+            }}>
+            About
+          </ThemedText>
+        </ThemedView>
 
       <ThemedView 
         style={styles.section}
@@ -97,21 +93,29 @@ export default function TabTwoScreen() {
            Made by <ExternalLink href="https://www.lugetech.com"><ThemedText style={styles.lugetech}>Lugetech</ThemedText></ExternalLink>
          </ThemedText>
        </ThemedView>
-
-    </ParallaxScrollView>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 32,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 24,
   },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+    justifyContent: 'center',
+    marginBottom: 8,
   },
    section: {
      gap: 6,
@@ -128,6 +132,11 @@ const styles = StyleSheet.create({
      fontSize: 15,
      lineHeight: 22,
      marginBottom: 3,
+   },
+   link: {
+     fontSize: 16,
+     fontWeight: '600',
+     textDecorationLine: 'underline',
    },
    footer: {
      marginTop: 24,

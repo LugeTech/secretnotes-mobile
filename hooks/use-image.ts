@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useNoteContext } from '@/components/note/note-provider';
 import { uploadImage, fetchImage, deleteImage, handleApiError } from '@/utils/api-client';
@@ -42,32 +42,7 @@ export function useImage() {
     }
   }, [note?.hasImage, passphrase, setImageUri, setIsLoadingImage, setError]);
 
-  const pickAndUploadImage = useCallback(async () => {
-    if (passphrase.length < 3) {
-      Alert.alert('Error', 'Please enter a passphrase first');
-      return;
-    }
-
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permissionResult.granted) {
-      Alert.alert('Permission Required', 'Camera roll permission is required to attach images.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1.0, // Get highest quality for better compression results
-      base64: false,
-    });
-
-    if (result.canceled) {
-      return;
-    }
-
-    const asset = result.assets[0];
-
+  const processAssetAndUpload = useCallback(async (asset: ImagePicker.ImagePickerAsset) => {
     setIsUploadingImage(true);
     setError(null);
     setCompressionProgress('Preparing image...');
@@ -138,6 +113,68 @@ export function useImage() {
     }
   }, [passphrase, setImageMetadata, setIsUploadingImage, setError, loadNote, loadImage]);
 
+  const pickAndUploadImage = useCallback(async () => {
+    if (passphrase.length < 3) {
+      Alert.alert('Error', 'Please enter a passphrase first');
+      return;
+    }
+
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert('Permission Required', 'Camera roll permission is required to attach images.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1.0,
+      base64: false,
+    });
+
+    if (result.canceled) {
+      return;
+    }
+
+    const asset = result.assets[0];
+
+    await processAssetAndUpload(asset);
+  }, [passphrase, processAssetAndUpload]);
+
+  const takeAndUploadPhoto = useCallback(async () => {
+    if (passphrase.length < 3) {
+      Alert.alert('Error', 'Please enter a passphrase first');
+      return;
+    }
+
+    if (Platform.OS === 'web') {
+      return pickAndUploadImage();
+    }
+
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert('Permission Required', 'Camera permission is required to take photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1.0,
+      base64: false,
+    });
+
+    if (result.canceled) {
+      return;
+    }
+
+    const asset = result.assets[0];
+
+    await processAssetAndUpload(asset);
+  }, [passphrase, pickAndUploadImage, processAssetAndUpload]);
+
   const removeImage = useCallback(async () => {
     if (passphrase.length < 3) {
       return;
@@ -183,6 +220,7 @@ export function useImage() {
   return {
     loadImage,
     pickAndUploadImage,
+    takeAndUploadPhoto,
     removeImage,
     compressionProgress,
   };

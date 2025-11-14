@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, TextInput, View, ActivityIndicator, Pressable } from 'react-native';
+import { StyleSheet, TextInput, View, ActivityIndicator, Pressable, Platform, ActionSheetIOS, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -48,7 +48,7 @@ export default function HomeScreen() {
   } = useNoteContext();
 
   const { loadNote, updateNote } = useNote();
-  const { loadImage, pickAndUploadImage, compressionProgress } = useImage();
+  const { loadImage, pickAndUploadImage, takeAndUploadPhoto, compressionProgress } = useImage();
 
   const DEFAULT_WELCOME_MESSAGE = 'Welcome to your new secure note!';
   const effectiveNoteContent =
@@ -64,6 +64,32 @@ export default function HomeScreen() {
   const handleViewerClose = () => {
     setIsImageViewerOpen(false);
     setIsThumbnailBlurred(true); // Restore blur when closing viewer
+  };
+
+  const handleAddOrReplaceImage = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Take Photo', 'Choose from Library'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) {
+            takeAndUploadPhoto();
+          } else if (buttonIndex === 2) {
+            pickAndUploadImage();
+          }
+        }
+      );
+    } else if (Platform.OS === 'android') {
+      Alert.alert('Add Image', 'Choose an option', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Take Photo', onPress: takeAndUploadPhoto },
+        { text: 'Choose from Library', onPress: pickAndUploadImage },
+      ]);
+    } else {
+      pickAndUploadImage();
+    }
   };
 
   const passphraseStrength = passphrase.length >= 3 ? getPassphraseStrength(passphrase) : null;
@@ -250,7 +276,7 @@ export default function HomeScreen() {
                 fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
                 thumbnailUri={imageUri}
                 onPress={handleImagePress}
-                onReplace={pickAndUploadImage}
+                onReplace={handleAddOrReplaceImage}
                 isLoading={isLoadingImage || isUploadingImage}
                 blur={isThumbnailBlurred}
                 blurRadius={8}
@@ -259,7 +285,7 @@ export default function HomeScreen() {
               <ImageAttachmentSection
                 mode="empty"
                 appearance="plain"
-                onPress={pickAndUploadImage}
+                onPress={handleAddOrReplaceImage}
                 isLoading={isLoadingImage || isUploadingImage}
               />
             ) : null}

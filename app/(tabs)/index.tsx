@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, TextInput, View, ActivityIndicator, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -17,10 +18,10 @@ import { ImageViewer } from '@/components/image/image-viewer';
 import { WelcomeScreen } from '@/components/welcome-screen';
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
   const iconColor = useThemeColor({}, 'text');
-  const noteInputRef = useRef<TextInput>(null);
   const [isThumbnailBlurred, setIsThumbnailBlurred] = useState(true);
-  
+
   const {
     passphrase,
     setPassphrase,
@@ -49,15 +50,11 @@ export default function HomeScreen() {
   const { loadNote, updateNote } = useNote();
   const { loadImage, pickAndUploadImage, compressionProgress } = useImage();
 
-  useAutoSave(noteContent, passphrase, updateNote, note !== null);
-
   const DEFAULT_WELCOME_MESSAGE = 'Welcome to your new secure note!';
+  const effectiveNoteContent =
+    noteContent === DEFAULT_WELCOME_MESSAGE ? '' : noteContent;
 
-  const handleNoteFocus = () => {
-    if (noteContent === DEFAULT_WELCOME_MESSAGE) {
-      noteInputRef.current?.setNativeProps({ selection: { start: 0, end: noteContent.length } });
-    }
-  };
+  useAutoSave(effectiveNoteContent, passphrase, updateNote, note !== null);
 
   const handleImagePress = () => {
     setIsThumbnailBlurred(false); // Clear blur when opening viewer
@@ -107,7 +104,12 @@ export default function HomeScreen() {
   }, [note?.hasImage, imageUri, loadImage]);
 
   return (
-    <ThemedView style={styles.root}>
+    <ThemedView style={[styles.root, {
+      paddingTop: Math.max(insets.top, 8),
+      paddingBottom: Math.max(insets.bottom, 8),
+      paddingLeft: Math.max(insets.left, 12),
+      paddingRight: Math.max(insets.right, 12),
+    }]}>
       {/* Error banner */}
       {error && (
         <ThemedView style={styles.errorBanner}>
@@ -221,10 +223,8 @@ export default function HomeScreen() {
             </View>
           ) : (
             <TextInput
-              ref={noteInputRef}
-              value={noteContent}
+              value={effectiveNoteContent}
               onChangeText={setNoteContent}
-              onFocus={handleNoteFocus}
               placeholder="Start typing your note..."
               editable={passphrase.length >= 3}
               multiline
@@ -296,7 +296,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    padding: 32,
     gap: 8,
   },
   errorBanner: {
@@ -334,29 +333,29 @@ const styles = StyleSheet.create({
   },
   bodyColumn: {
     flex: 1,
-    gap: 12,
+    gap: 8,
   },
   inputContainer: {
     marginBottom: 20,
   },
   inputFlex: {
-    flex: 15,
+    flex: 10,
     justifyContent: 'flex-end',
   },
   controlsRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 12,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   iconBtn: {
     padding: 4,
   },
   textInput: {
     color: 'black',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    marginTop: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    marginTop: 6,
     borderBottomWidth: 1,
     borderBottomColor: '#C0C0C0',
     fontSize: 16,
@@ -404,8 +403,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   noteSection: {
-    flex: 75,
-    marginBottom: 8,
+    flex: 70,
+    marginBottom: 4,
   },
   loadingContainer: {
     flex: 1,
@@ -428,7 +427,7 @@ const styles = StyleSheet.create({
     outlineStyle: 'none' as any,
   },
   imageFlex: {
-    flex: 10,
+    flex: 20,
     justifyContent: 'center',
     alignItems: 'flex-start',
   },

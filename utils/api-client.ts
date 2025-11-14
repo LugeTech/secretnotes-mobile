@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { NoteResponse, ImageUploadResponse, ErrorResponse } from '@/types';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -75,17 +76,22 @@ export async function uploadImage(
   }
 
   try {
-    // Convert image URI to blob
-    const imageResponse = await fetch(imageUri);
-    if (!imageResponse.ok) {
-      throw new Error(`Failed to read image from URI: ${imageResponse.statusText}`);
-    }
-    const blob = await imageResponse.blob();
-    
     const formData = new FormData();
-    
-    // Append blob with filename (this is the proper format for multipart/form-data)
-    formData.append('image', blob, fileName || 'photo.jpg');
+
+    if (Platform.OS === 'web') {
+      const imageResponse = await fetch(imageUri);
+      if (!imageResponse.ok) {
+        throw new Error(`Failed to read image from URI: ${imageResponse.statusText}`);
+      }
+      const blob = await imageResponse.blob();
+
+      formData.append('image', blob, fileName || 'photo.jpg');
+    } else {
+      const name = fileName || 'photo.jpg';
+      const type = fileType || 'image/jpeg';
+
+      formData.append('image', { uri: imageUri, name, type } as any);
+    }
 
     const response = await fetch(`${API_BASE_URL}/notes/image`, {
       method: 'POST',

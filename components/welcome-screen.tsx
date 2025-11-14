@@ -1,16 +1,16 @@
-import React from 'react';
-import { StyleSheet, View, Linking, Pressable, Platform } from 'react-native';
-import { ThemedText } from './themed-text';
-import { ThemedView } from './themed-view';
+import React from "react";
+import { StyleSheet, View, Linking, Pressable, Platform } from "react-native";
+import { ThemedText } from "./themed-text";
+import { ThemedView } from "./themed-view";
 
 export function WelcomeScreen() {
   const handleLinkPress = (url: string) => {
     Linking.openURL(url).catch((err) => {
-      console.error('Failed to open URL:', err);
+      console.error("Failed to open URL:", err);
     });
   };
 
-  const isNativeMobile = Platform.OS === 'ios' || Platform.OS === 'android';
+  const isNativeMobile = Platform.OS === "ios" || Platform.OS === "android";
 
   return (
     <ThemedView style={styles.container}>
@@ -24,18 +24,19 @@ export function WelcomeScreen() {
         </ThemedText>
 
         <ThemedText style={styles.paragraph} selectable>
-          Use a simple, fun passphrase for a public board others might stumble into. Use a long, unique passphrase for a private, encrypted note only you can open.
+          Use a simple, fun passphrase for a public board others might stumble
+          into. Use a long, unique passphrase for a private, encrypted note only
+          you can open.
+        </ThemedText>
+        <ThemedText style={styles.hint} selectable>
+          👆 Enter a passphrase above (min 3 characters) to get started
         </ThemedText>
 
         {!isNativeMobile && (
           <View style={styles.linksSection}>
-            <ThemedText style={styles.subheading} selectable>
-              Download the mobile app:
-            </ThemedText>
-
             <View style={styles.buttonsContainer}>
-              <Pressable 
-                onPress={() => handleLinkPress('https://apps.apple.com/app/secertnote/id6738635713')}
+              <Pressable
+                onPress={() => handleLinkPress("COMING_SOON")}
                 style={styles.linkButton}
               >
                 <ThemedText style={styles.linkText}>
@@ -43,8 +44,8 @@ export function WelcomeScreen() {
                 </ThemedText>
               </Pressable>
 
-              <Pressable 
-                onPress={() => handleLinkPress('https://play.google.com/store/apps/details?id=com.secertnote.mobile')}
+              <Pressable
+                onPress={() => handleLinkPress("COMING_SOON")}
                 style={styles.linkButton}
               >
                 <ThemedText style={styles.linkText}>
@@ -54,10 +55,6 @@ export function WelcomeScreen() {
             </View>
           </View>
         )}
-
-        <ThemedText style={styles.hint} selectable>
-          👆 Enter a passphrase above (min 3 characters) to get started
-        </ThemedText>
       </View>
     </ThemedView>
   );
@@ -67,31 +64,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
-    width: '100%',
+    width: "100%",
     maxWidth: 600, // Limit width on large screens
     gap: 20,
   },
   heading: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 8,
   },
   subheading: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
   paragraph: {
     fontSize: 16,
     lineHeight: 24,
     opacity: 0.9,
-    textAlign: 'center',
+    textAlign: "center",
   },
   linksSection: {
     marginTop: 8,
@@ -99,28 +96,28 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     gap: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   linkButton: {
-    backgroundColor: '#1976D2',
+    backgroundColor: "#1976D2",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginVertical: 4,
-    width: '100%',
+    width: "100%",
     maxWidth: 400, // Prevent stretching on large screens
   },
   linkText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   hint: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.7,
     marginTop: 16,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
 });

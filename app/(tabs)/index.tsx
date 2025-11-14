@@ -105,10 +105,10 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={[styles.root, {
-      paddingTop: Math.max(insets.top, 8),
-      paddingBottom: Math.max(insets.bottom, 8),
-      paddingLeft: Math.max(insets.left, 12),
-      paddingRight: Math.max(insets.right, 12),
+      paddingTop: insets.top + 32,
+      paddingBottom: insets.bottom + 8,
+      paddingLeft: Math.max(insets.left, 16),
+      paddingRight: Math.max(insets.right, 16),
     }]}>
       {/* Error banner */}
       {error && (
@@ -136,43 +136,45 @@ export default function HomeScreen() {
       <ThemedView style={styles.bodyColumn}> 
         {/* Passphrase input with underline (15%) */}
         <ThemedView style={styles.inputFlex}>
-          {/* Controls aligned to the right: show/hide phrase */}
-          <View style={styles.controlsRow}>
-            {passphrase.length > 0 && (
+          {/* Passphrase input container with icons inside */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={passphrase}
+              onChangeText={setPassphrase}
+              placeholder="Enter passphrase (min 3 chars)"
+              placeholderTextColor="#A0A0A0"
+              secureTextEntry={!passphraseVisible}
+              autoCorrect={false}
+              autoCapitalize="none"
+              textContentType="password"
+              autoComplete="off"
+              style={styles.textInput}
+              editable={!isLoadingNote}
+            />
+            {/* Icons positioned inside the input */}
+            <View style={styles.inputIconsRow}>
+              {passphrase.length > 0 && (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear passphrase"
+                  onPress={() => setPassphrase('')}
+                  hitSlop={8}
+                  style={styles.inputIcon}
+                >
+                  <IconSymbol name="xmark.circle.fill" size={20} color={iconColor} />
+                </Pressable>
+              )}
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Clear passphrase"
-                onPress={() => setPassphrase('')}
+                accessibilityLabel={passphraseVisible ? 'Hide passphrase' : 'Show passphrase'}
+                onPress={() => setPassphraseVisible(!passphraseVisible)}
                 hitSlop={8}
-                style={styles.iconBtn}
+                style={styles.inputIcon}
               >
-                <IconSymbol name="xmark.circle.fill" size={20} color={iconColor} />
+                <IconSymbol name={passphraseVisible ? 'eye.slash.fill' : 'eye.fill'} size={20} color={iconColor} />
               </Pressable>
-            )}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={passphraseVisible ? 'Hide passphrase' : 'Show passphrase'}
-              onPress={() => setPassphraseVisible(!passphraseVisible)}
-              hitSlop={8}
-              style={styles.iconBtn}
-            >
-              <IconSymbol name={passphraseVisible ? 'eye.slash.fill' : 'eye.fill'} size={20} color={iconColor} />
-            </Pressable>
+            </View>
           </View>
-
-          <TextInput
-            value={passphrase}
-            onChangeText={setPassphrase}
-            placeholder="Enter passphrase (min 3 chars)"
-            placeholderTextColor="#A0A0A0"
-            secureTextEntry={!passphraseVisible}
-            autoCorrect={false}
-            autoCapitalize="none"
-            textContentType="password"
-            autoComplete="off"
-            style={styles.textInput}
-            editable={!isLoadingNote}
-          />
           <View style={styles.inputFooter}>
             <View style={styles.passphraseInfo}>
               <ThemedText lightColor="#A0A0A0" darkColor="#A0A0A0" style={styles.charCount}>
@@ -336,26 +338,29 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   inputContainer: {
-    marginBottom: 20,
+    position: 'relative',
   },
   inputFlex: {
     flex: 10,
     justifyContent: 'flex-end',
   },
-  controlsRow: {
+  inputIconsRow: {
+    position: 'absolute',
+    right: 8,
+    top: 0,
+    bottom: 0,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-    marginBottom: 4,
+    alignItems: 'center',
+    gap: 8,
   },
-  iconBtn: {
+  inputIcon: {
     padding: 4,
   },
   textInput: {
     color: 'black',
     paddingVertical: 12,
-    paddingHorizontal: 12,
-    marginTop: 6,
+    paddingLeft: 12,
+    paddingRight: 70,
     borderBottomWidth: 1,
     borderBottomColor: '#C0C0C0',
     fontSize: 16,

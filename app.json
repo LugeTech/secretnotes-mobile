@@ -26,7 +26,7 @@
       "output": "static",
       "name": "Secret Notes",
       "shortName": "SecretNotes",
-      "description": "Zero-knowledge encrypted note storage with image attachments. Share passphrases, not links.",
+      "description": "Instantly create notes by entering a title. Use short titles for public boards or complex ones for private, encrypted vaults. No signup required.",
       "themeColor": "#0B1020",
       "display": "standalone",
       "backgroundColor": "#0B1020",

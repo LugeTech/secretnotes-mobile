@@ -6,16 +6,18 @@ interface SeoHeadProps {
   description?: string;
   image?: string;
   url?: string;
+  keywords?: string;
 }
 
-export function SeoHead({ title, description, image, url }: SeoHeadProps) {
+export function SeoHead({ title, description, image, url, keywords }: SeoHeadProps) {
   const siteName = "Secret Notes Mobile";
-  const defaultDescription = "Secure, zero-knowledge encrypted notes with image attachments. Share passphrases, not links.";
+  const defaultDescription = "Instantly create notes by entering a title. Use short titles for public boards or complex ones for private, encrypted vaults. No signup required.";
   const defaultImage = "/assets/images/icon.png"; // We'll need to ensure this works on web
   
   const fullTitle = `${title} | ${siteName}`;
   const metaDescription = description || defaultDescription;
   const ogImage = image || defaultImage;
+  const metaKeywords = keywords || "secure notes, encrypted storage, public board, pastebin, anonymous chat, dead drop, zero knowledge, privacy";
 
   const schemaData = {
     "@context": "https://schema.org",
@@ -37,6 +39,7 @@ export function SeoHead({ title, description, image, url }: SeoHeadProps) {
     <Head>
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
+      <meta name="keywords" content={metaKeywords} />
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="website" />

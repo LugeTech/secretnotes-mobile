@@ -21,12 +21,12 @@ export function WelcomeScreen() {
         </ThemedText>
 
         <ThemedText style={styles.paragraph} selectable>
-          Use a simple, fun passphrase for a public board others might stumble
-          into. Use a long, unique passphrase for a private, encrypted note only
+          Use a simple, fun title for a public board others might stumble
+          into. Use a long, unique title for a private, encrypted note only
           you can open.
         </ThemedText>
         <ThemedText style={styles.hint} selectable>
-          👆 Enter a passphrase above (min 3 characters) to get started
+          👆 Enter a title above (min 3 characters) to get started
         </ThemedText>
 
         {!isNativeMobile && (

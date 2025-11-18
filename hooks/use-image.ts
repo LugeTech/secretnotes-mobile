@@ -115,7 +115,7 @@ export function useImage() {
 
   const pickAndUploadImage = useCallback(async () => {
     if (passphrase.length < 3) {
-      Alert.alert('Error', 'Please enter a passphrase first');
+      Alert.alert('Error', 'Please enter a title first');
       return;
     }
 
@@ -144,7 +144,7 @@ export function useImage() {
 
   const takeAndUploadPhoto = useCallback(async () => {
     if (passphrase.length < 3) {
-      Alert.alert('Error', 'Please enter a passphrase first');
+      Alert.alert('Error', 'Please enter a title first');
       return;
     }
 

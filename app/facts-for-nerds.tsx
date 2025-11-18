@@ -34,8 +34,8 @@ export default function FactsForNerdsScreen() {
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Crypto at a glance</ThemedText>
         <ThemedText style={styles.bullet}>• AES-256-GCM for note and image encryption.</ThemedText>
-        <ThemedText style={styles.bullet}>• PBKDF2 (SHA-256, 10,000+ iterations) to derive keys from your passphrase.</ThemedText>
-        <ThemedText style={styles.bullet}>• Only a SHA-256 hash of your passphrase is stored for lookup.</ThemedText>
+        <ThemedText style={styles.bullet}>• PBKDF2 (SHA-256, 10,000+ iterations) to derive keys from your title.</ThemedText>
+        <ThemedText style={styles.bullet}>• Only a SHA-256 hash of your title is stored for lookup.</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>
@@ -49,15 +49,15 @@ export default function FactsForNerdsScreen() {
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>What we (still) see</ThemedText>
         <ThemedText style={styles.bullet}>• We see: encrypted blobs, hashes, timestamps.</ThemedText>
-        <ThemedText style={styles.bullet}>• We do not see: your raw passphrase or decrypted content.</ThemedText>
-        <ThemedText style={styles.bullet}>• Wrong passphrase = garbage; there&apos;s no admin backdoor to read your private notes.</ThemedText>
+        <ThemedText style={styles.bullet}>• We do not see: your raw title or decrypted content.</ThemedText>
+        <ThemedText style={styles.bullet}>• Wrong title = garbage; there&apos;s no admin backdoor to read your private notes.</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Nerdy caveats</ThemedText>
-        <ThemedText style={styles.bullet}>• Security still depends on your passphrase: avoid short, common, or reused ones.</ThemedText>
-        <ThemedText style={styles.bullet}>• Public/simple phrases act like shared boards anyone can stumble into.</ThemedText>
-        <ThemedText style={styles.emphasis}>Lose your passphrase? There&apos;s no recovery. That&apos;s by design.</ThemedText>
+        <ThemedText style={styles.bullet}>• Security still depends on your title: avoid short, common, or reused ones.</ThemedText>
+        <ThemedText style={styles.bullet}>• Public/simple titles act like shared boards anyone can stumble into.</ThemedText>
+        <ThemedText style={styles.emphasis}>Lose your title? There&apos;s no recovery. That&apos;s by design.</ThemedText>
       </ThemedView>
       </ScrollView>
     </ThemedView>

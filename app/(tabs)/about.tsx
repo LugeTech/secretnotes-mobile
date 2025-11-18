@@ -12,9 +12,10 @@ export default function TabTwoScreen() {
   return (
     <ThemedView style={styles.container}>
       <SeoHead 
-        title="About & Privacy" 
-        description="Learn how Secret Notes protects your privacy using client-side AES-256-GCM encryption and zero-knowledge architecture."
+        title="About & Use Cases" 
+        description="Use Secret Notes for dead drops, puzzles, anonymous chat, public ads, or private storage. Your title determines visibility."
         url="https://secretnotes.app/about"
+        keywords="dead drop, puzzle, riddle, anonymous chat, public board, pastebin, secure storage, encrypted note, private vault"
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image
@@ -39,8 +40,8 @@ export default function TabTwoScreen() {
       >
         <ThemedText style={styles.sectionTitle}>When is this useful?</ThemedText>
         <ThemedText style={styles.bullet}>• Capture thoughts you don’t want tied to an account or synced profile.</ThemedText>
-        <ThemedText style={styles.bullet}>• Share a simple passphrase so two people see the same private space instantly.</ThemedText>
-        <ThemedText style={styles.bullet}>• Spin up “burner” spaces for plans, drafts, or photos you can walk away from by forgetting the phrase.</ThemedText>
+        <ThemedText style={styles.bullet}>• Share a simple title so two people see the same private space instantly.</ThemedText>
+        <ThemedText style={styles.bullet}>• Spin up “burner” spaces for plans, drafts, or photos you can walk away from by forgetting the title.</ThemedText>
       </ThemedView>
 
       <ThemedView 
@@ -50,8 +51,8 @@ export default function TabTwoScreen() {
       >
         <ThemedText style={styles.sectionTitle}>What makes it different?</ThemedText>
         <ThemedText style={styles.bullet}>• Notes aren’t public URLs: only this site/app shows in history, not what you wrote.</ThemedText>
-        <ThemedText style={styles.bullet}>• Your passphrase is the key: change it, and you’re in a completely different space.</ThemedText>
-        <ThemedText style={styles.bullet}>• One passphrase = one focused note + one image: clean, minimal, easy to remember.</ThemedText>
+        <ThemedText style={styles.bullet}>• Your title is the key: change it, and you’re in a completely different space.</ThemedText>
+        <ThemedText style={styles.bullet}>• One title = one focused note + one image: clean, minimal, easy to remember.</ThemedText>
       </ThemedView>
 
       <ThemedView 
@@ -60,7 +61,7 @@ export default function TabTwoScreen() {
         darkColor="rgba(120, 100, 90, 0.2)"
       >
         <ThemedText style={styles.sectionTitle}>How it works</ThemedText>
-        <ThemedText style={styles.bullet}>• Type a passphrase (3+ characters) to open its note.</ThemedText>
+        <ThemedText style={styles.bullet}>• Type a title (3+ characters) to open its note.</ThemedText>
         <ThemedText style={styles.bullet}>• After you pause, the app fetches or creates that note in the background.</ThemedText>
         <ThemedText style={styles.bullet}>• Your changes auto-save after short pauses—no manual sync dance.</ThemedText>
         <ThemedText style={styles.bullet}>• Add one image to keep an important screenshot, document, or photo with the note.</ThemedText>
@@ -74,9 +75,9 @@ export default function TabTwoScreen() {
          <ThemedText style={styles.sectionTitle}>Why it’s private by design</ThemedText>
          <ThemedText style={styles.bullet}>Built so even we can’t read your private notes.</ThemedText>
          <ThemedText style={styles.bullet}>• AES-256-GCM encryption for notes and images before they hit the database.</ThemedText>
-         <ThemedText style={styles.bullet}>• Only a SHA-256 hash of your passphrase is stored—never the passphrase itself.</ThemedText>
-         <ThemedText style={styles.bullet}>• No account, profile, or feed to inspect: without your exact passphrase, your private note stays unreadable.</ThemedText>
-         <ThemedText style={styles.bullet}>• Strong, unique passphrases = private vaults; obvious phrases behave like open, shared boards.</ThemedText>
+         <ThemedText style={styles.bullet}>• Only a SHA-256 hash of your title is stored—never the title itself.</ThemedText>
+         <ThemedText style={styles.bullet}>• No account, profile, or feed to inspect: without your exact title, your private note stays unreadable.</ThemedText>
+         <ThemedText style={styles.bullet}>• Strong, unique titles = private vaults; obvious titles behave like open, shared boards.</ThemedText>
        </ThemedView>
  
        <ThemedView 

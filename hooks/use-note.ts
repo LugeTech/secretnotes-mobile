@@ -19,7 +19,7 @@ export function useNote() {
 
   const loadNote = useCallback(async () => {
     if (passphrase.length < 3) {
-      setError('Passphrase must be at least 3 characters');
+      setError('Title must be at least 3 characters');
       return;
     }
 
@@ -42,7 +42,7 @@ export function useNote() {
 
   const updateNote = useCallback(async (message: string) => {
     if (passphrase.length < 3) {
-      setError('Passphrase must be at least 3 characters');
+      setError('Title must be at least 3 characters');
       return;
     }
 

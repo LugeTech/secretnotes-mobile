@@ -32,7 +32,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 export async function fetchNote(passphrase: string): Promise<NoteResponse> {
   if (passphrase.length < 3) {
-    throw new ApiError(400, 'Passphrase must be at least 3 characters long');
+    throw new ApiError(400, 'Title must be at least 3 characters long');
   }
 
   const response = await fetch(`${API_BASE_URL}/notes`, {
@@ -50,7 +50,7 @@ export async function saveNote(
   message: string
 ): Promise<NoteResponse> {
   if (passphrase.length < 3) {
-    throw new ApiError(400, 'Passphrase must be at least 3 characters long');
+    throw new ApiError(400, 'Title must be at least 3 characters long');
   }
 
   const response = await fetch(`${API_BASE_URL}/notes`, {
@@ -72,7 +72,7 @@ export async function uploadImage(
   fileType?: string
 ): Promise<ImageUploadResponse> {
   if (passphrase.length < 3) {
-    throw new ApiError(400, 'Passphrase must be at least 3 characters long');
+    throw new ApiError(400, 'Title must be at least 3 characters long');
   }
 
   try {
@@ -113,7 +113,7 @@ export async function uploadImage(
 
 export async function fetchImage(passphrase: string): Promise<string> {
   if (passphrase.length < 3) {
-    throw new ApiError(400, 'Passphrase must be at least 3 characters long');
+    throw new ApiError(400, 'Title must be at least 3 characters long');
   }
 
   const response = await fetch(`${API_BASE_URL}/notes/image`, {
@@ -151,7 +151,7 @@ export async function fetchImage(passphrase: string): Promise<string> {
 
 export async function deleteImage(passphrase: string): Promise<void> {
   if (passphrase.length < 3) {
-    throw new ApiError(400, 'Passphrase must be at least 3 characters long');
+    throw new ApiError(400, 'Title must be at least 3 characters long');
   }
 
   const response = await fetch(`${API_BASE_URL}/notes/image`, {

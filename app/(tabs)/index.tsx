@@ -180,8 +180,8 @@ export default function HomeScreen() {
       paddingRight: Math.max(insets.right, 16),
     }]}>
       <SeoHead 
-        title="Secure Storage" 
-        description="Create and share encrypted notes instantly with just a passphrase. Zero-knowledge privacy, image attachments, and auto-save."
+        title="Instant Public Boards & Private Vaults" 
+        description="Create notes instantly. Use short titles for public boards (jokes, ads, chat) or complex titles for private, encrypted vaults. No signup."
       />
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -213,13 +213,13 @@ export default function HomeScreen() {
           </ThemedView>
         )}
         
-        {/* Header: Passphrase Input */}
+        {/* Header: Title Input */}
         <View style={styles.headerSection}>
           <View style={styles.inputContainer}>
             <TextInput
               value={passphrase}
               onChangeText={setPassphrase}
-              placeholder="Enter passphrase"
+              placeholder="Enter title"
               placeholderTextColor="#9CA3AF"
               secureTextEntry={!passphraseVisible}
               autoCorrect={false}
@@ -240,7 +240,7 @@ export default function HomeScreen() {
               {passphrase.length > 0 && (
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Clear passphrase"
+                  accessibilityLabel="Clear title"
                   onPress={() => setPassphrase('')}
                   hitSlop={8}
                   style={styles.inputIcon}
@@ -250,7 +250,7 @@ export default function HomeScreen() {
               )}
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={passphraseVisible ? 'Hide passphrase' : 'Show passphrase'}
+                accessibilityLabel={passphraseVisible ? 'Hide title' : 'Show title'}
                 onPress={() => setPassphraseVisible(!passphraseVisible)}
                 hitSlop={8}
                 style={styles.inputIcon}
@@ -268,13 +268,13 @@ export default function HomeScreen() {
               {passphraseStrength && (
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Passphrase strength information"
+                  accessibilityLabel="Title strength information"
                   onPress={() => {
                     console.log('Strength badge clicked!');
                     setInfoModal({
                       visible: true,
-                      title: 'Passphrase Strength',
-                      message: 'Your passphrase strength is determined by its length:\n\n• Weak: Less than 6 characters\n• Medium: 6-11 characters\n• Strong: 12 or more characters\n\nLonger passphrases make your note more secure and harder to guess.',
+                      title: 'Title Strength',
+                      message: 'Your title strength is determined by its length:\n\n• Weak: Less than 6 characters\n• Medium: 6-11 characters\n• Strong: 12 or more characters\n\nLonger titles make your note more secure and harder to guess.',
                     });
                   }}
                   hitSlop={8}
@@ -305,7 +305,7 @@ export default function HomeScreen() {
                     setInfoModal({
                       visible: true,
                       title: '⚠️ Public Note Warning',
-                      message: 'Your passphrase uses common words that are easy to guess. Anyone who tries common phrases like "hello", "test", or "password" could access this note.\n\nFor better privacy, use a unique passphrase with uncommon words, numbers, or special characters.',
+                      message: 'Your title uses common words that are easy to guess. Anyone who tries common phrases like "hello", "test", or "password" could access this note.\n\nFor better privacy, use a unique title with uncommon words, numbers, or special characters.',
                     });
                   }}
                   hitSlop={8}

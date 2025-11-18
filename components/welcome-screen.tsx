@@ -1,14 +1,11 @@
 import React from "react";
-import { StyleSheet, View, Linking, Pressable, Platform } from "react-native";
+import { StyleSheet, View, Pressable, Platform } from "react-native";
+import { useRouter } from "expo-router";
 import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
 
 export function WelcomeScreen() {
-  const handleLinkPress = (url: string) => {
-    Linking.openURL(url).catch((err) => {
-      console.error("Failed to open URL:", err);
-    });
-  };
+  const router = useRouter();
 
   const isNativeMobile = Platform.OS === "ios" || Platform.OS === "android";
 
@@ -36,7 +33,7 @@ export function WelcomeScreen() {
           <View style={styles.linksSection}>
             <View style={styles.buttonsContainer}>
               <Pressable
-                onPress={() => handleLinkPress("COMING_SOON")}
+                onPress={() => router.push("/COMING_SOON")}
                 style={styles.linkButton}
               >
                 <ThemedText style={styles.linkText}>
@@ -45,7 +42,7 @@ export function WelcomeScreen() {
               </Pressable>
 
               <Pressable
-                onPress={() => handleLinkPress("COMING_SOON")}
+                onPress={() => router.push("/COMING_SOON")}
                 style={styles.linkButton}
               >
                 <ThemedText style={styles.linkText}>

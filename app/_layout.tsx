@@ -48,6 +48,7 @@ export default function RootLayout() {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="facts-for-nerds" options={{ title: 'Facts for Nerds' }} />
+            <Stack.Screen name="COMING_SOON" options={{ title: 'Coming Soon' }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />

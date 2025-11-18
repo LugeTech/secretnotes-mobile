@@ -12,8 +12,8 @@ const COMMON_PHRASES = [
 ];
 
 export function getPassphraseStrength(passphrase: string): PassphraseStrength {
-  if (passphrase.length < 8) return 'weak';
-  if (passphrase.length < 16) return 'medium';
+  if (passphrase.length < 6) return 'weak';
+  if (passphrase.length < 12) return 'medium';
   return 'strong';
 }
 

@@ -24,6 +24,7 @@ const MAPPING = {
   'moon.fill': 'dark-mode',
   'questionmark.circle.fill': 'help',
   'xmark.circle.fill': 'cancel',
+  'plus': 'add',
 } as IconMapping;
 
 /**

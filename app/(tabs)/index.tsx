@@ -17,6 +17,7 @@ import { getPassphraseStrength, isCommonPhrase, getPassphraseColor } from '@/uti
 import { ImageViewer } from '@/components/image/image-viewer';
 import { WelcomeScreen } from '@/components/welcome-screen';
 import { InfoModal } from '@/components/ui/info-modal';
+import { SeoHead } from '@/components/seo-head';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -178,6 +179,10 @@ export default function HomeScreen() {
       paddingLeft: Math.max(insets.left, 16),
       paddingRight: Math.max(insets.right, 16),
     }]}>
+      <SeoHead 
+        title="Secure Storage" 
+        description="Create and share encrypted notes instantly with just a passphrase. Zero-knowledge privacy, image attachments, and auto-save."
+      />
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}

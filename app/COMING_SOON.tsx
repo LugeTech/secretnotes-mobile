@@ -4,12 +4,17 @@ import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { SeoHead } from '@/components/seo-head';
 
 export default function ComingSoonScreen() {
   const router = useRouter();
 
   return (
     <ThemedView style={styles.container}>
+      <SeoHead 
+        title="Native Apps Coming Soon" 
+        description="Secret Notes for iOS and Android are coming soon. Use the secure web version today."
+      />
       <ThemedText style={styles.heading} selectable>
         App Store Links Coming Soon
       </ThemedText>

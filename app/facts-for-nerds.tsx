@@ -4,10 +4,16 @@ import { Image } from 'expo-image';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
+import { SeoHead } from '@/components/seo-head';
 
 export default function FactsForNerdsScreen() {
   return (
     <ThemedView style={styles.container}>
+      <SeoHead 
+        title="Technical Security Details" 
+        description="In-depth look at Secret Notes encryption: AES-256-GCM, PBKDF2 key derivation, and SHA-256 hashing."
+        url="https://secretnotes.app/facts-for-nerds"
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image
           source={require('@/assets/images/icon.png')}

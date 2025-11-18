@@ -6,10 +6,16 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
 import { router } from 'expo-router';
+import { SeoHead } from '@/components/seo-head';
 
 export default function TabTwoScreen() {
   return (
     <ThemedView style={styles.container}>
+      <SeoHead 
+        title="About & Privacy" 
+        description="Learn how Secret Notes protects your privacy using client-side AES-256-GCM encryption and zero-knowledge architecture."
+        url="https://secretnotes.app/about"
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image
           source={require('@/assets/images/icon.png')}

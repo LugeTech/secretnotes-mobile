@@ -1,41 +1,57 @@
 {
   "expo": {
-    "name": "secertnote-mobile",
+    "name": "Secret Notes",
     "slug": "secertnote-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-      "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "secertnotemobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lugetech.secretnotemobile"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#0B1020"
       },
+      "package": "com.lugetech.secretnotemobile",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "favicon": "./assets/images/favicon.png",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "name": "Secret Notes",
+      "shortName": "SecretNotes",
+      "description": "Zero-knowledge encrypted note storage with image attachments. Share passphrases, not links.",
+      "themeColor": "#0B1020",
+      "display": "standalone",
+      "backgroundColor": "#0B1020",
+      "lang": "en",
+      "meta": {
+        "apple": {
+          "mobileWebAppCapable": "yes",
+          "mobileWebAppStatusBarStyle": "black-translucent"
+        },
+        "viewport": "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      }
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
-         {
-           "image": "./assets/images/icon.png",
-           "imageWidth": 240,
-           "resizeMode": "contain",
-           "backgroundColor": "#0B1020",
-           "dark": {
-             "backgroundColor": "#0B1020"
-           }
-         }
+        {
+          "image": "./assets/images/icon.png",
+          "imageWidth": 240,
+          "resizeMode": "contain",
+          "backgroundColor": "#0B1020",
+          "dark": {
+            "backgroundColor": "#0B1020"
+          }
+        }
       ]
     ],
     "experiments": {

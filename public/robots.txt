@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /_expo/
+Disallow: /modal
+
+Sitemap: https://secretnotes.app/sitemap.xml

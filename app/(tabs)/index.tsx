@@ -19,7 +19,37 @@ import { WelcomeScreen } from '@/components/welcome-screen';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const iconColor = useThemeColor({}, 'text');
+  const iconColor = useThemeColor({}, 'icon');
+  const textColor = useThemeColor({}, 'text');
+  const inputBackgroundColor = useThemeColor(
+    { light: '#F8F8F8', dark: '#1E1F20' },
+    'background'
+  );
+  const errorBannerBackground = useThemeColor(
+    { light: '#FFEBEE', dark: '#3B1212' },
+    'background'
+  );
+  const errorTextColor = useThemeColor(
+    { light: '#D32F2F', dark: '#FFCDD2' },
+    'text'
+  );
+  const progressBannerBackground = useThemeColor(
+    { light: '#E3F2FD', dark: '#10273C' },
+    'background'
+  );
+  const progressTextColor = useThemeColor(
+    { light: '#1976D2', dark: '#90CAF9' },
+    'text'
+  );
+  const blurButtonBackground = useThemeColor(
+    { light: 'rgba(0, 0, 0, 0.05)', dark: 'rgba(255, 255, 255, 0.08)' },
+    'background'
+  );
+  const blurButtonBorderColor = useThemeColor(
+    { light: 'rgba(0, 0, 0, 0.1)', dark: 'rgba(255, 255, 255, 0.16)' },
+    'background'
+  );
+  const tintColor = useThemeColor({}, 'tint');
   const [isThumbnailBlurred, setIsThumbnailBlurred] = useState(true);
 
   const {
@@ -144,23 +174,25 @@ export default function HomeScreen() {
     }]}>
       {/* Error banner */}
       {error && (
-        <ThemedView style={styles.errorBanner}>
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
+        <ThemedView style={[styles.errorBanner, { backgroundColor: errorBannerBackground }]}>
+          <ThemedText style={[styles.errorText, { color: errorTextColor }]}>{error}</ThemedText>
           <Pressable
             onPress={() => setError(null)}
             hitSlop={8}
             style={styles.errorClose}
           >
-            <IconSymbol name="xmark.circle.fill" size={20} color="#D32F2F" />
+            <IconSymbol name="xmark.circle.fill" size={20} color={errorTextColor} />
           </Pressable>
         </ThemedView>
       )}
 
       {/* Compression progress banner */}
       {compressionProgress && (
-        <ThemedView style={styles.progressBanner}>
-          <ActivityIndicator size="small" color="#1976D2" />
-          <ThemedText style={styles.progressText}>{compressionProgress}</ThemedText>
+        <ThemedView style={[styles.progressBanner, { backgroundColor: progressBannerBackground }]}>
+          <ActivityIndicator size="small" color={progressTextColor} />
+          <ThemedText style={[styles.progressText, { color: progressTextColor }]}>
+            {compressionProgress}
+          </ThemedText>
         </ThemedView>
       )}
       
@@ -180,7 +212,14 @@ export default function HomeScreen() {
               autoCapitalize="none"
               textContentType="password"
               autoComplete="off"
-              style={styles.textInput}
+              style={[
+                styles.textInput,
+                {
+                  color: textColor,
+                  backgroundColor: inputBackgroundColor,
+                  borderBottomColor: iconColor,
+                },
+              ]}
               editable={!isLoadingNote}
             />
             {/* Icons positioned inside the input */}
@@ -263,7 +302,7 @@ export default function HomeScreen() {
               editable={passphrase.length >= 3}
               multiline
               scrollEnabled
-              style={styles.noteArea}
+              style={[styles.noteArea, { color: textColor }]}
               textAlignVertical="top"
               autoCorrect={false}
               autoCapitalize="none"
@@ -303,12 +342,18 @@ export default function HomeScreen() {
                 accessibilityLabel={isThumbnailBlurred ? 'Show thumbnail' : 'Hide thumbnail'}
                 onPress={() => setIsThumbnailBlurred(!isThumbnailBlurred)}
                 hitSlop={8}
-                style={styles.blurToggleBtn}
+                style={[
+                  styles.blurToggleBtn,
+                  {
+                    backgroundColor: blurButtonBackground,
+                    borderColor: blurButtonBorderColor,
+                  },
+                ]}
               >
                 <IconSymbol
                   name={isThumbnailBlurred ? 'eye.slash.fill' : 'eye.fill'}
                   size={18}
-                  color={isThumbnailBlurred ? '#1976D2' : iconColor}
+                  color={isThumbnailBlurred ? tintColor : iconColor}
                 />
               </Pressable>
             )}
@@ -336,14 +381,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFEBEE',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
   },
   errorText: {
     flex: 1,
-    color: '#D32F2F',
     fontSize: 14,
     marginRight: 8,
   },
@@ -354,14 +397,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E3F2FD',
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
     gap: 8,
   },
   progressText: {
-    color: '#1976D2',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -389,14 +430,11 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   textInput: {
-    color: 'black',
     paddingVertical: 12,
     paddingLeft: 12,
     paddingRight: 70,
     borderBottomWidth: 1,
-    borderBottomColor: '#C0C0C0',
     fontSize: 16,
-    backgroundColor: '#F8F8F8',
     borderRadius: 8,
   },
   inputFooter: {
@@ -459,7 +497,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
     lineHeight: 24,
-    color: 'black',
     borderWidth: 0,
     outlineStyle: 'none' as any,
   },
@@ -479,10 +516,8 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
 });

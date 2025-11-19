@@ -1,51 +1,38 @@
-# Welcome to your Expo app 👋
+# Secret Notes
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Secure, Anonymous, Encrypted Notes for Everyone.**
 
-## Get started
+Secret Notes is a mobile and web application designed for storing your thoughts, passwords, or shared messages securely without the need for accounts, emails, or complicated setups.
 
-1. Install dependencies
+## 🔒 How It Works
 
-   ```bash
-   npm install
-   ```
+Secret Notes uses a unique **Passphrase-Driven** system. You don't create an account; you simply create a passphrase.
 
-2. Start the app
+1.  **Enter a Passphrase**: Type in any phrase, word, or combination of characters.
+2.  **Your Note Appears**:
+    *   If the passphrase has never been used, a brand new blank note is created just for you.
+    *   If the passphrase already exists, the note associated with it is unlocked and decrypted.
+3.  **Auto-Save**: Just type. Your notes are automatically saved and encrypted as you work.
 
-   ```bash
-   npx expo start
-   ```
+## ✨ Key Features
 
-In the output, you'll find options to open the app in a
+*   **Zero-Knowledge Encryption**: Your notes are encrypted on your device before they are sent to the server. We cannot read your notes even if we wanted to.
+*   **No Sign-Ups**: No email, no phone number, no username. Just you and your passphrase.
+*   **Image Attachments**: Securely attach images to your notes. They are encrypted too!
+*   **Instant Sharing**: Want to share a note? Just tell someone the passphrase.
+*   **Cross-Platform**: Access your notes from iOS, Android, or the Web.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🛡️ Security & Privacy
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### The Power of Your Passphrase
+Your passphrase is both your **ID** and your **Encryption Key**.
 
-## Get a fresh project
+*   **Simple Passphrases (Public/Shared)**: If you use a common word like "shopping", you might land on a note used by others. This is great for quick public sharing but not for secrets.
+*   **Complex Passphrases (Private)**: For true privacy, use a long, unique passphrase that only you know. The stronger the passphrase, the more secure your note.
 
-When you're ready, run:
+### Important Warning
+**There is no "Forgot Password" button.**
+Because we don't know who you are and we can't decrypt your data, if you forget your passphrase, your note is lost forever.
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# secretnotes-mobile
+---
+*Simple. Secure. Secret.*

@@ -8,6 +8,8 @@ import { Fonts } from '@/constants/theme';
 import { router } from 'expo-router';
 import { SeoHead } from '@/components/seo-head';
 
+import { IconSymbol } from '@/components/ui/icon-symbol';
+
 export default function TabTwoScreen() {
   return (
     <ThemedView style={styles.container}>
@@ -93,6 +95,23 @@ export default function TabTwoScreen() {
          </ThemedText>
        </ThemedView>
 
+       <ThemedView 
+         style={styles.section}
+         lightColor="rgba(230, 230, 230, 0.5)"
+         darkColor="rgba(50, 50, 50, 0.2)"
+       >
+         <ThemedText style={styles.sectionTitle}>Open Source</ThemedText>
+         <ThemedText style={styles.bullet}>Check out our code on GitHub:</ThemedText>
+         <ExternalLink href="https://github.com/LugeTech/secretnotes-mobile" style={styles.githubLink}>
+           <IconSymbol name="chevron.left.forwardslash.chevron.right" size={18} color="#0969DA" style={styles.githubIcon} />
+           <ThemedText style={styles.githubLinkText}>Mobile App (Frontend)</ThemedText>
+         </ExternalLink>
+         <ExternalLink href="https://github.com/ktappdev/secretnotes-go-backend" style={styles.githubLink}>
+            <IconSymbol name="chevron.left.forwardslash.chevron.right" size={18} color="#0969DA" style={styles.githubIcon} />
+            <ThemedText style={styles.githubLinkText}>Go Server (Backend)</ThemedText>
+         </ExternalLink>
+       </ThemedView>
+
        <ThemedView style={styles.footer}>
          <ThemedText style={styles.madeBy}>
            Made by <ExternalLink href="https://www.lugetech.com"><ThemedText style={styles.lugetech}>Lugetech</ThemedText></ExternalLink>
@@ -156,5 +175,21 @@ const styles = StyleSheet.create({
      fontSize: 14,
      fontWeight: '600',
      textDecorationLine: 'underline',
+   },
+   githubLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+    paddingVertical: 4,
+   },
+   githubIcon: {
+     marginTop: 2,
+   },
+   githubLinkText: {
+    fontSize: 15,
+    color: '#0969DA',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
    },
 });

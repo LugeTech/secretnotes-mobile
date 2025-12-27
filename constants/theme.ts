@@ -12,18 +12,26 @@ export const Colors = {
   light: {
     text: '#11181C',
     background: '#fff',
-    tint: tintColorLight,
+    tint: '#6366f1', // Indigo
+    tintSecondary: '#8b5cf6', // Purple
+    success: '#10b981',
+    warning: '#f59e0b',
     icon: '#687076',
     tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    tabIconSelected: '#6366f1',
+    gradients: ['#ffffff', '#f8fafc', '#f1f5f9'],
   },
   dark: {
     text: '#ECEDEE',
     background: '#151718',
-    tint: tintColorDark,
+    tint: '#818cf8', // Lighter indigo
+    tintSecondary: '#a78bfa', // Lighter purple
+    success: '#34d399',
+    warning: '#fbbf24',
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tabIconSelected: '#818cf8',
+    gradients: ['#151718', '#1a1d1e', '#1f2324'],
   },
 };
 

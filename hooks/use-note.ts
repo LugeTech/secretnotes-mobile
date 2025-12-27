@@ -1,7 +1,7 @@
+import { useNoteContext } from '@/components/note/note-provider';
+import { fetchNote, handleApiError, saveNote } from '@/utils/api-client';
 import { useCallback } from 'react';
 import { Alert } from 'react-native';
-import { useNoteContext } from '@/components/note/note-provider';
-import { fetchNote, saveNote, handleApiError } from '@/utils/api-client';
 
 export function useNote() {
   const {
@@ -17,7 +17,7 @@ export function useNote() {
     clearNote,
   } = useNoteContext();
 
-  const loadNote = useCallback(async () => {
+  const loadNote = useCallback(async (signal?: AbortSignal) => {
     if (passphrase.length < 3) {
       setError('Title must be at least 3 characters');
       return;
@@ -27,11 +27,15 @@ export function useNote() {
     setError(null);
 
     try {
-      const fetchedNote = await fetchNote(passphrase);
+      const fetchedNote = await fetchNote(passphrase, signal);
       setNote(fetchedNote);
       setNoteContent(fetchedNote.message);
       setOriginalContent(fetchedNote.message);
     } catch (error) {
+      // Silently ignore aborted requests - user typed again while loading
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       const message = handleApiError(error);
       setError(message);
       Alert.alert('Error Loading Note', message);

@@ -25,10 +25,10 @@ export function isCommonPhrase(passphrase: string): boolean {
 export function getPassphraseColor(strength: PassphraseStrength): string {
   switch (strength) {
     case 'weak':
-      return '#FF5252';
+      return '#ef4444'; // Red-500
     case 'medium':
-      return '#FF9800';
+      return '#f59e0b'; // Amber-500
     case 'strong':
-      return '#4CAF50';
+      return '#10b981'; // Emerald-500
   }
 }

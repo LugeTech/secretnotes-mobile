@@ -1,5 +1,5 @@
+import { ErrorResponse, ImageUploadResponse, NoteResponse } from '@/types';
 import { Platform } from 'react-native';
-import { NoteResponse, ImageUploadResponse, ErrorResponse } from '@/types';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -30,7 +30,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return await response.json();
 }
 
-export async function fetchNote(passphrase: string): Promise<NoteResponse> {
+export async function fetchNote(passphrase: string, signal?: AbortSignal): Promise<NoteResponse> {
   if (passphrase.length < 3) {
     throw new ApiError(400, 'Title must be at least 3 characters long');
   }
@@ -39,7 +39,8 @@ export async function fetchNote(passphrase: string): Promise<NoteResponse> {
     method: 'GET',
     headers: {
       'X-Passphrase': passphrase
-    }
+    },
+    signal
   });
 
   return handleResponse<NoteResponse>(response);
@@ -134,7 +135,7 @@ export async function fetchImage(passphrase: string): Promise<string> {
   }
 
   const blob = await response.blob();
-  
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -177,13 +178,13 @@ export function handleApiError(error: unknown): string {
         return error.message;
     }
   }
-  
+
   if (error instanceof Error) {
     if (error.message.includes('Network request failed')) {
       return 'No internet connection. Please check your network.';
     }
     return error.message;
   }
-  
+
   return 'An unexpected error occurred.';
 }

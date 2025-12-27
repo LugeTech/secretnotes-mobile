@@ -1,63 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, TextInput, View, ActivityIndicator, Pressable, Platform, ActionSheetIOS, Alert, KeyboardAvoidingView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActionSheetIOS, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ImageViewer } from '@/components/image/image-viewer';
+import { useNoteContext } from '@/components/note/note-provider';
+import { SaveIndicator } from '@/components/note/save-indicator';
+import { SeoHead } from '@/components/seo-head';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import ImageAttachmentSection from '@/components/ui/image-attachment-section';
+import { AnimatedPressable } from '@/components/ui/animated-pressable';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useNoteContext } from '@/components/note/note-provider';
-import { useNote } from '@/hooks/use-note';
-import { useImage } from '@/hooks/use-image';
-import { useAutoSave } from '@/hooks/use-auto-save';
-import { SaveIndicator } from '@/components/note/save-indicator';
-import { formatFileSize } from '@/utils/format';
-import { getPassphraseStrength, isCommonPhrase, getPassphraseColor } from '@/utils/passphrase';
-import { ImageViewer } from '@/components/image/image-viewer';
-import { WelcomeScreen } from '@/components/welcome-screen';
+import ImageAttachmentSection from '@/components/ui/image-attachment-section';
 import { InfoModal } from '@/components/ui/info-modal';
-import { SeoHead } from '@/components/seo-head';
+import { NoteSkeleton } from '@/components/ui/skeleton-loader';
+import { WelcomeScreen } from '@/components/welcome-screen';
+import { useAutoSave } from '@/hooks/use-auto-save';
+import { useImage } from '@/hooks/use-image';
+import { useNote } from '@/hooks/use-note';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { formatFileSize } from '@/utils/format';
+import { getPassphraseColor, getPassphraseStrength, isCommonPhrase } from '@/utils/passphrase';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const iconColor = useThemeColor({}, 'icon');
-  const textColor = useThemeColor({}, 'text');
+  const iconColor = useThemeColor({}, 'icon') as string;
+  const textColor = useThemeColor({}, 'text') as string;
   const inputBackgroundColor = useThemeColor(
     { light: '#F0F2F5', dark: '#1E1F20' },
     'background'
-  );
+  ) as string;
   const errorBannerBackground = useThemeColor(
     { light: '#FFEBEE', dark: '#3B1212' },
     'background'
-  );
+  ) as string;
   const errorTextColor = useThemeColor(
     { light: '#D32F2F', dark: '#FFCDD2' },
     'text'
-  );
+  ) as string;
   const progressBannerBackground = useThemeColor(
     { light: '#E3F2FD', dark: '#10273C' },
     'background'
-  );
+  ) as string;
   const progressTextColor = useThemeColor(
     { light: '#1976D2', dark: '#90CAF9' },
     'text'
-  );
+  ) as string;
   const blurButtonBackground = useThemeColor(
     { light: 'rgba(0, 0, 0, 0.05)', dark: 'rgba(255, 255, 255, 0.08)' },
     'background'
-  );
+  ) as string;
   const blurButtonBorderColor = useThemeColor(
     { light: 'rgba(0, 0, 0, 0.1)', dark: 'rgba(255, 255, 255, 0.16)' },
     'background'
-  );
-  const tintColor = useThemeColor({}, 'tint');
+  ) as string;
+  const tintColor = useThemeColor({}, 'tint') as string;
   const [isThumbnailBlurred, setIsThumbnailBlurred] = useState(true);
   const [infoModal, setInfoModal] = useState<{ visible: boolean; title: string; message: string }>({
     visible: false,
     title: '',
     message: '',
   });
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const strengthFadeAnim = useRef(new Animated.Value(0)).current;
+  const strengthScaleAnim = useRef(new Animated.Value(0.9)).current;
 
   const {
     passphrase,
@@ -72,6 +79,7 @@ export default function HomeScreen() {
     imageMetadata,
     setImageMetadata,
     isLoadingNote,
+    setIsLoadingNote,
     isSavingNote,
     isLoadingImage,
     isUploadingImage,
@@ -132,17 +140,36 @@ export default function HomeScreen() {
   const passphraseStrength = passphrase.length >= 3 ? getPassphraseStrength(passphrase) : null;
   const isPublicNote = passphrase.length >= 3 && isCommonPhrase(passphrase);
 
+  // Keep a ref to the current AbortController so we can cancel in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   useEffect(() => {
     if (passphrase.length < 3) {
       clearNote();
       return;
     }
 
-    const handle = setTimeout(() => {
-      loadNote();
-    }, 500);
+    // Cancel any in-flight request when user types again
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
 
-    return () => clearTimeout(handle);
+    // Set loading immediately when title becomes valid to show skeleton during debounce
+    setIsLoadingNote(true);
+
+    const handle = setTimeout(() => {
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      loadNote(controller.signal);
+    }, 1000);
+
+    return () => {
+      clearTimeout(handle);
+      // Also abort if component unmounts or passphrase changes before timeout
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [passphrase, loadNote, clearNote]);
 
   // Clear any previously loaded image when switching passphrase or notes
@@ -160,6 +187,38 @@ export default function HomeScreen() {
     }
   }, [note?.id, setImageUri, setImageMetadata, setIsImageViewerOpen]);
 
+  // Handle fade animations when state changes
+  useEffect(() => {
+    fadeAnim.setValue(0);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [passphrase.length < 3, isLoadingNote]);
+
+  // Handle strength indicator animations
+  useEffect(() => {
+    if (passphraseStrength) {
+      Animated.parallel([
+        Animated.timing(strengthFadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.spring(strengthScaleAnim, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 50,
+          friction: 7,
+        }),
+      ]).start();
+    } else {
+      strengthFadeAnim.setValue(0);
+      strengthScaleAnim.setValue(0.9);
+    }
+  }, [passphraseStrength]);
+
   useEffect(() => {
     if (note?.hasImage && !imageUri) {
       loadImage();
@@ -172,262 +231,276 @@ export default function HomeScreen() {
     }
   }, [note?.id, imageUri, note?.hasImage, setIsThumbnailBlurred]);
 
-  return (
-    <ThemedView style={[styles.root, {
-      paddingTop: insets.top + 16,
-      paddingBottom: insets.bottom + 8,
-      paddingLeft: Math.max(insets.left, 16),
-      paddingRight: Math.max(insets.right, 16),
-    }]}>
-      <SeoHead 
-        title="Instant Public Boards & Private Vaults" 
-        description="Create notes instantly. Use short titles for public boards (jokes, ads, chat) or complex titles for private, encrypted vaults. No signup."
-      />
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoidingView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
-        enabled={Platform.OS !== 'web'}
-      >
-        {/* Error banner */}
-        {error && (
-          <ThemedView style={[styles.errorBanner, { backgroundColor: errorBannerBackground }]}>
-            <ThemedText style={[styles.errorText, { color: errorTextColor }]}>{error}</ThemedText>
-            <Pressable
-              onPress={() => setError(null)}
-              hitSlop={8}
-              style={styles.errorClose}
-            >
-              <IconSymbol name="xmark.circle.fill" size={20} color={errorTextColor} />
-            </Pressable>
-          </ThemedView>
-        )}
+  const gradientColors = useThemeColor({}, 'gradients' as any) as unknown as string[];
 
-        {/* Compression progress banner */}
-        {compressionProgress && (
-          <ThemedView style={[styles.progressBanner, { backgroundColor: progressBannerBackground }]}>
-            <ActivityIndicator size="small" color={progressTextColor} />
-            <ThemedText style={[styles.progressText, { color: progressTextColor }]}>
-              {compressionProgress}
-            </ThemedText>
-          </ThemedView>
-        )}
-        
-        {/* Header: Title Input */}
-        <View style={styles.headerSection}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              value={passphrase}
-              onChangeText={setPassphrase}
-              placeholder="Enter title"
-              placeholderTextColor="#9CA3AF"
-              secureTextEntry={!passphraseVisible}
-              autoCorrect={false}
-              autoCapitalize="none"
-              textContentType="password"
-              autoComplete="off"
-              style={[
-                styles.textInput,
-                {
-                  color: textColor,
-                  backgroundColor: inputBackgroundColor,
-                },
-              ]}
-              editable={!isLoadingNote}
-            />
-            {/* Icons positioned inside the input */}
-            <View style={styles.inputIconsRow}>
-              {passphrase.length > 0 && (
-                <Pressable
+  return (
+    <LinearGradient
+      colors={(gradientColors && gradientColors.length >= 2 ? gradientColors : ['#ffffff', '#f1f5f9']) as unknown as [string, string, ...string[]]}
+      style={styles.root}
+    >
+      <ThemedView style={[styles.mainContainer, {
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 8,
+        paddingLeft: Math.max(insets.left, 16),
+        paddingRight: Math.max(insets.right, 16),
+        backgroundColor: 'transparent',
+      }]}>
+        <SeoHead
+          title="Instant Public Boards & Private Vaults"
+          description="Create notes instantly. Use short titles for public boards (jokes, ads, chat) or complex titles for private, encrypted vaults. No signup."
+        />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoidingView}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+          enabled={Platform.OS !== 'web'}
+        >
+          {/* Error banner */}
+          {error && (
+            <ThemedView style={[styles.errorBanner, { backgroundColor: errorBannerBackground }]}>
+              <ThemedText style={[styles.errorText, { color: errorTextColor }]}>{error}</ThemedText>
+              <Pressable
+                onPress={() => setError(null)}
+                hitSlop={8}
+                style={styles.errorClose}
+              >
+                <IconSymbol name="xmark.circle.fill" size={20} color={errorTextColor} />
+              </Pressable>
+            </ThemedView>
+          )}
+
+          {/* Compression progress banner */}
+          {compressionProgress && (
+            <ThemedView style={[styles.progressBanner, { backgroundColor: progressBannerBackground }]}>
+              <ActivityIndicator size="small" color={progressTextColor} />
+              <ThemedText style={[styles.progressText, { color: progressTextColor }]}>
+                {compressionProgress}
+              </ThemedText>
+            </ThemedView>
+          )}
+
+          {/* Header: Title Input */}
+          <View style={styles.headerSection}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={passphrase}
+                onChangeText={setPassphrase}
+                placeholder="Enter title"
+                placeholderTextColor="#9CA3AF"
+                secureTextEntry={!passphraseVisible}
+                autoCorrect={false}
+                autoCapitalize="none"
+                textContentType="password"
+                autoComplete="off"
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
+                style={[
+                  styles.textInput,
+                  {
+                    color: textColor,
+                    backgroundColor: inputBackgroundColor,
+                    borderColor: isInputFocused ? tintColor : 'transparent',
+                    borderWidth: 2,
+                  },
+                  isInputFocused && styles.textInputFocused,
+                ]}
+              />
+              {/* Icons positioned inside the input */}
+              <View style={styles.inputIconsRow}>
+                {passphrase.length > 0 && (
+                  <AnimatedPressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Clear title"
+                    onPress={() => setPassphrase('')}
+                    hitSlop={8}
+                    style={styles.inputIcon}
+                  >
+                    <IconSymbol name="xmark.circle.fill" size={18} color={iconColor} />
+                  </AnimatedPressable>
+                )}
+                <AnimatedPressable
                   accessibilityRole="button"
-                  accessibilityLabel="Clear title"
-                  onPress={() => setPassphrase('')}
+                  accessibilityLabel={passphraseVisible ? 'Hide title' : 'Show title'}
+                  onPress={() => setPassphraseVisible(!passphraseVisible)}
                   hitSlop={8}
                   style={styles.inputIcon}
                 >
-                  <IconSymbol name="xmark.circle.fill" size={18} color={iconColor} />
-                </Pressable>
-              )}
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={passphraseVisible ? 'Hide title' : 'Show title'}
-                onPress={() => setPassphraseVisible(!passphraseVisible)}
-                hitSlop={8}
-                style={styles.inputIcon}
-              >
-                <IconSymbol name={passphraseVisible ? 'eye.slash.fill' : 'eye.fill'} size={18} color={iconColor} />
-              </Pressable>
+                  <IconSymbol name={passphraseVisible ? 'eye.slash.fill' : 'eye.fill'} size={18} color={iconColor} />
+                </AnimatedPressable>
+              </View>
+            </View>
+
+            <View style={styles.inputFooter}>
+              <View style={styles.passphraseInfo}>
+                <ThemedText style={styles.charCount}>
+                  {passphrase.length > 0 ? `${passphrase.length} chars` : 'Min 3 chars'}
+                </ThemedText>
+                {passphraseStrength && (
+                  <Animated.View style={{ opacity: strengthFadeAnim, transform: [{ scale: strengthScaleAnim }] }}>
+                    <AnimatedPressable
+                      accessibilityRole="button"
+                      accessibilityLabel="Title strength information"
+                      onPress={() => {
+                        console.log('Strength badge clicked!');
+                        setInfoModal({
+                          visible: true,
+                          title: 'Title Strength',
+                          message: 'Your title strength is determined by its length:\n\n• Weak: Less than 6 characters\n• Medium: 6-11 characters\n• Strong: 12 or more characters\n\nLonger titles make your note more secure and harder to guess.',
+                        });
+                      }}
+                      hitSlop={8}
+                      style={styles.strengthIndicator}
+                    >
+                      <View
+                        style={[
+                          styles.strengthDot,
+                          { backgroundColor: getPassphraseColor(passphraseStrength) }
+                        ]}
+                      />
+                      <ThemedText
+                        style={[
+                          styles.strengthText,
+                          { color: getPassphraseColor(passphraseStrength) }
+                        ]}
+                      >
+                        {passphraseStrength}
+                      </ThemedText>
+                    </AnimatedPressable>
+                  </Animated.View>
+                )}
+                {isPublicNote && (
+                  <AnimatedPressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Public note warning"
+                    onPress={() => {
+                      console.log('Public badge clicked!');
+                      setInfoModal({
+                        visible: true,
+                        title: '⚠️ Public Note Warning',
+                        message: 'Your title uses common words that are easy to guess. Anyone who tries common phrases like "hello", "test", or "password" could access this note.\n\nFor better privacy, use a unique title with uncommon words, numbers, or special characters.',
+                      });
+                    }}
+                    hitSlop={8}
+                    style={styles.publicWarningContainer}
+                  >
+                    <ThemedText style={styles.publicWarning}>⚠️ Public</ThemedText>
+                  </AnimatedPressable>
+                )}
+              </View>
+              <View style={styles.saveSection}>
+                {note && (
+                  <SaveIndicator
+                    isSaving={isSavingNote}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                    lastSavedAt={lastSavedAt}
+                  />
+                )}
+              </View>
             </View>
           </View>
-          
-          <View style={styles.inputFooter}>
-            <View style={styles.passphraseInfo}>
-              <ThemedText style={styles.charCount}>
-                {passphrase.length > 0 ? `${passphrase.length} chars` : 'Min 3 chars'}
-              </ThemedText>
-              {passphraseStrength && (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Title strength information"
-                  onPress={() => {
-                    console.log('Strength badge clicked!');
-                    setInfoModal({
-                      visible: true,
-                      title: 'Title Strength',
-                      message: 'Your title strength is determined by its length:\n\n• Weak: Less than 6 characters\n• Medium: 6-11 characters\n• Strong: 12 or more characters\n\nLonger titles make your note more secure and harder to guess.',
-                    });
-                  }}
-                  hitSlop={8}
-                  style={styles.strengthIndicator}
-                >
-                  <View
-                    style={[
-                      styles.strengthDot,
-                      { backgroundColor: getPassphraseColor(passphraseStrength) }
-                    ]}
+
+          {/* Body: Note Content */}
+          <Animated.View style={[styles.noteSection, { opacity: fadeAnim }]}>
+            {passphrase.length < 3 ? (
+              <WelcomeScreen />
+            ) : isLoadingNote ? (
+              <NoteSkeleton />
+            ) : (
+              <TextInput
+                value={effectiveNoteContent}
+                onChangeText={setNoteContent}
+                placeholder="Start typing your note..."
+                placeholderTextColor="#9CA3AF"
+                editable={passphrase.length >= 3}
+                multiline
+                scrollEnabled
+                style={[styles.noteArea, { color: textColor }]}
+                textAlignVertical="top"
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+            )}
+          </Animated.View>
+
+          {/* Footer: Image Attachment */}
+          {passphrase.length >= 3 && !isLoadingNote && (
+            <View style={styles.footerSection}>
+              <ThemedView style={styles.imageContainer}>
+                {note && note.hasImage && imageUri ? (
+                  <ImageAttachmentSection
+                    mode="preview"
+                    appearance="plain"
+                    fileName={isThumbnailBlurred ? 'Image hidden' : 'Image'}
+                    fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
+                    thumbnailUri={imageUri}
+                    onPress={handleImagePress}
+                    onReplace={handleAddOrReplaceImage}
+                    isLoading={isLoadingImage || isUploadingImage}
+                    blur={isThumbnailBlurred}
+                    blurRadius={20}
                   />
-                  <ThemedText
+                ) : note ? (
+                  <ImageAttachmentSection
+                    mode="empty"
+                    appearance="dashed"
+                    onPress={handleAddOrReplaceImage}
+                    isLoading={isLoadingImage || isUploadingImage}
+                    style={styles.emptyImageSection}
+                  />
+                ) : null}
+
+                {/* Blur toggle button - absolute positioned within image container when preview is shown */}
+                {note && note.hasImage && imageUri && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={isThumbnailBlurred ? 'Show thumbnail' : 'Hide thumbnail'}
+                    onPress={() => setIsThumbnailBlurred(!isThumbnailBlurred)}
+                    hitSlop={8}
                     style={[
-                      styles.strengthText,
-                      { color: getPassphraseColor(passphraseStrength) }
+                      styles.blurToggleBtn,
+                      {
+                        backgroundColor: blurButtonBackground,
+                        borderColor: blurButtonBorderColor,
+                      },
                     ]}
                   >
-                    {passphraseStrength}
-                  </ThemedText>
-                </Pressable>
-              )}
-              {isPublicNote && (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Public note warning"
-                  onPress={() => {
-                    console.log('Public badge clicked!');
-                    setInfoModal({
-                      visible: true,
-                      title: '⚠️ Public Note Warning',
-                      message: 'Your title uses common words that are easy to guess. Anyone who tries common phrases like "hello", "test", or "password" could access this note.\n\nFor better privacy, use a unique title with uncommon words, numbers, or special characters.',
-                    });
-                  }}
-                  hitSlop={8}
-                  style={styles.publicWarningContainer}
-                >
-                  <ThemedText style={styles.publicWarning}>⚠️ Public</ThemedText>
-                </Pressable>
-              )}
+                    <IconSymbol
+                      name={isThumbnailBlurred ? 'eye.slash.fill' : 'eye.fill'}
+                      size={16}
+                      color={isThumbnailBlurred ? tintColor : iconColor}
+                    />
+                  </Pressable>
+                )}
+              </ThemedView>
             </View>
-            <View style={styles.saveSection}>
-              {note && (
-                <SaveIndicator
-                  isSaving={isSavingNote}
-                  hasUnsavedChanges={hasUnsavedChanges}
-                  lastSavedAt={lastSavedAt}
-                />
-              )}
-            </View>
-          </View>
-        </View>
-
-        {/* Body: Note Content */}
-        <View style={styles.noteSection}>
-          {passphrase.length < 3 ? (
-            <WelcomeScreen />
-          ) : isLoadingNote ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" />
-              <ThemedText style={styles.loadingText}>Loading note...</ThemedText>
-            </View>
-          ) : (
-            <TextInput
-              value={effectiveNoteContent}
-              onChangeText={setNoteContent}
-              placeholder="Start typing your note..."
-              placeholderTextColor="#9CA3AF"
-              editable={passphrase.length >= 3}
-              multiline
-              scrollEnabled
-              style={[styles.noteArea, { color: textColor }]}
-              textAlignVertical="top"
-              autoCorrect={false}
-              autoCapitalize="none"
-            />
           )}
-        </View>
+        </KeyboardAvoidingView>
 
-        {/* Footer: Image Attachment */}
-        {passphrase.length >= 3 && !isLoadingNote && (
-          <View style={styles.footerSection}>
-            <ThemedView style={styles.imageContainer}>
-              {note && note.hasImage && imageUri ? (
-                <ImageAttachmentSection
-                  mode="preview"
-                  appearance="plain"
-                  fileName={isThumbnailBlurred ? 'Image hidden' : 'Image'}
-                  fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
-                  thumbnailUri={imageUri}
-                  onPress={handleImagePress}
-                  onReplace={handleAddOrReplaceImage}
-                  isLoading={isLoadingImage || isUploadingImage}
-                  blur={isThumbnailBlurred}
-                  blurRadius={20}
-                />
-              ) : note ? (
-                <ImageAttachmentSection
-                  mode="empty"
-                  appearance="dashed"
-                  onPress={handleAddOrReplaceImage}
-                  isLoading={isLoadingImage || isUploadingImage}
-                  style={styles.emptyImageSection}
-                />
-              ) : null}
+        {/* Image Viewer Modal */}
+        <ImageViewer
+          visible={isImageViewerOpen}
+          imageUri={imageUri}
+          fileName="Image"
+          onClose={handleViewerClose}
+        />
 
-              {/* Blur toggle button - absolute positioned within image container when preview is shown */}
-              {note && note.hasImage && imageUri && (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={isThumbnailBlurred ? 'Show thumbnail' : 'Hide thumbnail'}
-                  onPress={() => setIsThumbnailBlurred(!isThumbnailBlurred)}
-                  hitSlop={8}
-                  style={[
-                    styles.blurToggleBtn,
-                    {
-                      backgroundColor: blurButtonBackground,
-                      borderColor: blurButtonBorderColor,
-                    },
-                  ]}
-                >
-                  <IconSymbol
-                    name={isThumbnailBlurred ? 'eye.slash.fill' : 'eye.fill'}
-                    size={16}
-                    color={isThumbnailBlurred ? tintColor : iconColor}
-                  />
-                </Pressable>
-              )}
-            </ThemedView>
-          </View>
-        )}
-      </KeyboardAvoidingView>
-
-      {/* Image Viewer Modal */}
-      <ImageViewer
-        visible={isImageViewerOpen}
-        imageUri={imageUri}
-        fileName="Image"
-        onClose={handleViewerClose}
-      />
-
-      {/* Info Modal */}
-      <InfoModal
-        visible={infoModal.visible}
-        title={infoModal.title}
-        message={infoModal.message}
-        onClose={() => setInfoModal({ visible: false, title: '', message: '' })}
-      />
-    </ThemedView>
+        {/* Info Modal */}
+        <InfoModal
+          visible={infoModal.visible}
+          title={infoModal.title}
+          message={infoModal.message}
+          onClose={() => setInfoModal({ visible: false, title: '', message: '' })}
+        />
+      </ThemedView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+  },
+  mainContainer: {
     flex: 1,
   },
   keyboardAvoidingView: {
@@ -491,6 +564,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     borderRadius: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  textInputFocused: {
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   inputFooter: {
     flexDirection: 'row',

@@ -233,6 +233,37 @@ export default function HomeScreen() {
 
   const gradientColors = useThemeColor({}, 'gradients' as any) as unknown as string[];
 
+  const runReload = (signal?: AbortSignal) => {
+    // Cancel any in-flight request before starting a new one
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    loadNote(signal ?? controller.signal);
+  };
+
+  const handleReloadNote = () => {
+    if (passphrase.length < 3) {
+      setError('Title must be at least 3 characters');
+      return;
+    }
+
+    if (hasUnsavedChanges) {
+      Alert.alert(
+        'Reload note?',
+        'You have unsaved changes. Reloading will discard local edits and fetch the latest version from the server.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Reload', style: 'destructive', onPress: () => runReload() },
+        ]
+      );
+      return;
+    }
+
+    runReload();
+  };
+
   return (
     <LinearGradient
       colors={(gradientColors && gradientColors.length >= 2 ? gradientColors : ['#ffffff', '#f1f5f9']) as unknown as [string, string, ...string[]]}
@@ -388,6 +419,23 @@ export default function HomeScreen() {
                 )}
               </View>
               <View style={styles.saveSection}>
+                <AnimatedPressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Reload note"
+                  onPress={handleReloadNote}
+                  disabled={isLoadingNote || passphrase.length < 3}
+                  hitSlop={10}
+                  style={[
+                    styles.reloadButton,
+                    { opacity: isLoadingNote || passphrase.length < 3 ? 0.5 : 1 },
+                  ]}
+                >
+                  {isLoadingNote ? (
+                    <ActivityIndicator size="small" color={tintColor} />
+                  ) : (
+                    <IconSymbol name="arrow.clockwise" size={18} color={tintColor} />
+                  )}
+                </AnimatedPressable>
                 {note && (
                   <SaveIndicator
                     isSaving={isSavingNote}
@@ -624,6 +672,17 @@ const styles = StyleSheet.create({
   saveSection: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+  },
+  reloadButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   noteSection: {
     flex: 1,

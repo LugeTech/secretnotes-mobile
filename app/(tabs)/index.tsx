@@ -96,7 +96,7 @@ export default function HomeScreen() {
     clearNote,
   } = useNoteContext();
 
-  const { loadNote, updateNote } = useNote();
+  const { loadNote, updateNote, forceUpdateNote } = useNote();
   const { loadImage, pickAndUploadImage, takeAndUploadPhoto, compressionProgress } = useImage();
 
   const DEFAULT_WELCOME_MESSAGE = 'Welcome to your new secure note!';
@@ -277,13 +277,20 @@ export default function HomeScreen() {
     }
   }, [remoteUpdateAvailable, hasUnsavedChanges]);
 
+  // Direct reload for banner button - skips confirmation since user already sees the conflict banner
+  const handleBannerReload = () => {
+    setRemoteUpdateAvailable(false);
+    runReload();
+  };
+
   const handleOverwriteRemote = async () => {
     try {
-      await updateNote(effectiveNoteContent);
+      // Use forceUpdateNote (no version) to bypass conflict and overwrite server
+      await forceUpdateNote(effectiveNoteContent);
       // Only clear flag if save succeeded (no exception thrown)
       setRemoteUpdateAvailable(false);
     } catch {
-      // updateNote already shows an alert on error, flag stays true
+      // forceUpdateNote already shows an alert on error, flag stays true
     }
   };
 
@@ -351,7 +358,7 @@ export default function HomeScreen() {
                 Updated on server. Reload to view or overwrite.
               </ThemedText>
               <View style={styles.remoteBannerActions}>
-                <Pressable onPress={handleReloadNote} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
+                <Pressable onPress={handleBannerReload} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
                   <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Reload</ThemedText>
                 </Pressable>
                 <Pressable onPress={handleOverwriteRemote} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>

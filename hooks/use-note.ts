@@ -86,9 +86,40 @@ export function useNote() {
     }
   }, [passphrase, note?.version, setNote, setOriginalContent, setIsSavingNote, setError, setLastSavedAt, setRemoteUpdateAvailable, setRemoteUpdatedAt]);
 
+  // Force save without version check (last-write-wins) - used for "Overwrite" action
+  const forceUpdateNote = useCallback(async (message: string) => {
+    if (passphrase.length < 3) {
+      setError('Title must be at least 3 characters');
+      return;
+    }
+
+    setIsSavingNote(true);
+    setError(null);
+
+    try {
+      // Omit version to use last-write-wins mode
+      const updatedNote = await saveNote(passphrase, message);
+      setNote(updatedNote);
+      setOriginalContent(message);
+      setLastSavedAt(new Date());
+      setRemoteUpdateAvailable(false);
+      if (updatedNote.updated) {
+        setRemoteUpdatedAt(new Date(updatedNote.updated));
+      }
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      setError(errorMessage);
+      Alert.alert('Error Saving Note', errorMessage);
+      throw error;
+    } finally {
+      setIsSavingNote(false);
+    }
+  }, [passphrase, setNote, setOriginalContent, setIsSavingNote, setError, setLastSavedAt, setRemoteUpdateAvailable, setRemoteUpdatedAt]);
+
   return {
     loadNote,
     updateNote,
+    forceUpdateNote,
     clearNote,
   };
 }

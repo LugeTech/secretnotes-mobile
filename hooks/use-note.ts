@@ -53,6 +53,29 @@ export function useNote() {
     }
   }, [passphrase, setNote, setNoteContent, setOriginalContent, setIsLoadingNote, setError]);
 
+  // Silent reload: fetch and update content without loading spinner (no flicker)
+  const silentReload = useCallback(async () => {
+    if (passphrase.length < 3) return;
+
+    try {
+      const fetchedNote = await fetchNote(passphrase);
+      setNote(fetchedNote);
+      setNoteContent(fetchedNote.message);
+      setOriginalContent(fetchedNote.message);
+      setRemoteUpdateAvailable(false);
+      if (fetchedNote.updated) {
+        setRemoteUpdatedAt(new Date(fetchedNote.updated));
+      } else {
+        setRemoteUpdatedAt(null);
+      }
+    } catch (error) {
+      // On error, fall back to showing the error but don't block UI
+      if (error instanceof Error && error.name === 'AbortError') return;
+      const message = handleApiError(error);
+      setError(message);
+    }
+  }, [passphrase, setNote, setNoteContent, setOriginalContent, setError, setRemoteUpdateAvailable, setRemoteUpdatedAt]);
+
   const updateNote = useCallback(async (message: string) => {
     if (passphrase.length < 3) {
       setError('Title must be at least 3 characters');
@@ -118,6 +141,7 @@ export function useNote() {
 
   return {
     loadNote,
+    silentReload,
     updateNote,
     forceUpdateNote,
     clearNote,

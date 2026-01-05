@@ -12,14 +12,26 @@ const PB_BASE_URL = API_BASE_URL ? new URL('/', API_BASE_URL).origin : '';
 // Create a single PocketBase instance
 const pb = PB_BASE_URL ? new PocketBase(PB_BASE_URL) : null;
 
-export function useRealtimeNote() {
+export function useRealtimeNote(onRemoteUpdate?: () => void) {
   const {
     note,
     passphrase,
     remoteUpdatedAt,
+    hasUnsavedChanges,
     setRemoteUpdateAvailable,
     setRemoteUpdatedAt,
   } = useNoteContext();
+
+  // Keep hasUnsavedChanges in a ref so the SSE callback always has the latest value
+  const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
+  useEffect(() => {
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
+  const onRemoteUpdateRef = useRef(onRemoteUpdate);
+  useEffect(() => {
+    onRemoteUpdateRef.current = onRemoteUpdate;
+  }, [onRemoteUpdate]);
 
   // Track the last update timestamp we set locally to filter self-triggered events
   const lastLocalUpdateRef = useRef<Date | null>(null);
@@ -67,8 +79,14 @@ export function useRealtimeNote() {
         setRemoteUpdatedAt(serverUpdated);
       }
       
-      console.log('[PB] Setting remoteUpdateAvailable = true');
-      setRemoteUpdateAvailable(true);
+      // Only show banner if user has local changes; otherwise just trigger silent update
+      if (hasUnsavedChangesRef.current) {
+        console.log('[PB] User has unsaved changes, showing banner');
+        setRemoteUpdateAvailable(true);
+      } else {
+        console.log('[PB] No local changes, triggering silent update');
+        onRemoteUpdateRef.current?.();
+      }
     }).catch((err) => {
       console.warn('[PB] Subscribe failed:', err);
     });

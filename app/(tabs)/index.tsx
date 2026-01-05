@@ -104,7 +104,9 @@ export default function HomeScreen() {
 
   useRealtimeNote();
 
-  useAutoSave(effectiveNoteContent, passphrase, updateNote, note !== null && !remoteUpdateAvailable);
+  // Pass originalContent so autosave knows when content was loaded from server (not user edit)
+  const { originalContent } = useNoteContext();
+  useAutoSave(effectiveNoteContent, passphrase, updateNote, note !== null && !remoteUpdateAvailable, originalContent);
 
   const handleImagePress = () => {
     setIsThumbnailBlurred(false); // Clear blur when opening viewer

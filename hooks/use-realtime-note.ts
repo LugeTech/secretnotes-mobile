@@ -92,7 +92,11 @@ export function useRealtimeNote() {
       if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
         reconnectAttemptsRef.current += 1;
         console.log(`SSE reconnect attempt ${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS}`);
-        source.close();
+        try {
+          source.close();
+        } catch {
+          // Ignore close errors on web
+        }
         reconnectTimeoutRef.current = setTimeout(() => {
           // Re-run effect by closing and letting cleanup trigger
           eventSourceRef.current = null;
@@ -104,7 +108,11 @@ export function useRealtimeNote() {
     reconnectAttemptsRef.current = 0;
 
     return () => {
-      source.close();
+      try {
+        source.close();
+      } catch {
+        // Ignore close errors - can happen on web if connection not fully initialized
+      }
       eventSourceRef.current = null;
       clientIdRef.current = null;
       if (reconnectTimeoutRef.current) {

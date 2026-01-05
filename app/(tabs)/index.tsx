@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActionSheetIOS, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -104,7 +104,20 @@ export default function HomeScreen() {
   const effectiveNoteContent =
     noteContent === DEFAULT_WELCOME_MESSAGE ? '' : noteContent;
 
-  useRealtimeNote();
+  // Handle remote updates: if no local changes, silently reload with highlight animation
+  const handleRemoteUpdate = useCallback(() => {
+    silentReload().then(() => {
+      // Pulse highlight animation to show content updated
+      highlightAnim.setValue(1);
+      Animated.timing(highlightAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: false,
+      }).start();
+    });
+  }, [silentReload, highlightAnim]);
+
+  useRealtimeNote(handleRemoteUpdate);
 
   // Pass originalContent so autosave knows when content was loaded from server (not user edit)
   useAutoSave(
@@ -277,22 +290,6 @@ export default function HomeScreen() {
 
     runReload();
   };
-
-  // Auto-refresh if a remote update arrives and we have no local edits to protect
-  // Use silentReload to avoid flicker (no loading spinner)
-  useEffect(() => {
-    if (remoteUpdateAvailable && !hasUnsavedChanges) {
-      silentReload().then(() => {
-        // Pulse highlight animation to show content updated
-        highlightAnim.setValue(1);
-        Animated.timing(highlightAnim, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: false,
-        }).start();
-      });
-    }
-  }, [remoteUpdateAvailable, hasUnsavedChanges, silentReload, highlightAnim]);
 
   // Direct reload for banner button - skips confirmation since user already sees the conflict banner
   const handleBannerReload = () => {

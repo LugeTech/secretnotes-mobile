@@ -13,7 +13,7 @@ export function SeoHead({ title, description, image, url, keywords }: SeoHeadPro
   const siteName = "Secret Notes";
   const defaultDescription =
     "Instant, zero-signup notes. Short titles create public boards; complex titles create private, encrypted vaults with realtime sync.";
-  const defaultImage = "/assets/images/icon.png"; // Ensure this resolves on web deploy
+  const defaultImage = "https://secretnotez.com/og-image.webp"; // WebP for smaller file size
   
   const fullTitle = `${title} | ${siteName}`;
   const metaDescription = description || defaultDescription;
@@ -45,19 +45,22 @@ export function SeoHead({ title, description, image, url, keywords }: SeoHeadPro
       "priceCurrency": "USD"
     },
     "description": metaDescription,
-    "image": "https://secretnotes.app/assets/images/icon.png",
-    "url": "https://secretnotes.app"
+    "image": "https://secretnotez.com/og-image.webp",
+    "url": "https://secretnotez.com"
   };
 
   return (
     <Head>
       <title>{fullTitle}</title>
+      <link rel="canonical" href={url || "https://secretnotez.com"} />
+      <link rel="icon" href="/favicon.ico" sizes="any" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       <meta name="description" content={metaDescription} />
       <meta name="keywords" content={metaKeywords} />
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content={url || "https://secretnotes.app"} />
+      <meta property="og:url" content={url || "https://secretnotez.com"} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:image" content={ogImage} />
@@ -65,7 +68,7 @@ export function SeoHead({ title, description, image, url, keywords }: SeoHeadPro
 
       {/* Twitter */}
       <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={url || "https://secretnotes.app"} />
+      <meta property="twitter:url" content={url || "https://secretnotez.com"} />
       <meta property="twitter:title" content={fullTitle} />
       <meta property="twitter:description" content={metaDescription} />
       <meta property="twitter:image" content={ogImage} />

@@ -11,7 +11,7 @@ export default function AutosaveFlowScreen() {
       <SeoHead
         title="Autosave & Realtime Flow"
         description="How autosave, realtime updates, and conflict handling work in Secret Notes."
-        url="https://secretnotes.app/autosave-flow"
+        url="https://secretnotez.com/autosave-flow"
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <ThemedView style={styles.titleContainer}>

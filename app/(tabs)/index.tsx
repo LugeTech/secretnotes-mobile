@@ -19,10 +19,10 @@ import { WelcomeScreen } from '@/components/welcome-screen';
 import { useAutoSave } from '@/hooks/use-auto-save';
 import { useImage } from '@/hooks/use-image';
 import { useNote } from '@/hooks/use-note';
-import { useRealtimeNote } from '@/hooks/use-realtime-note';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { formatFileSize } from '@/utils/format';
 import { getPassphraseColor, getPassphraseStrength, isCommonPhrase } from '@/utils/passphrase';
+import { useRealtimeNote } from '../../hooks/use-realtime-note';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();

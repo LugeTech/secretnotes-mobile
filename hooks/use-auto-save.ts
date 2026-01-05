@@ -26,8 +26,13 @@ export function useAutoSave(
     }
 
     timeoutRef.current = window.setTimeout(async () => {
-      await onSave(content);
-      previousContentRef.current = content;
+      try {
+        await onSave(content);
+        previousContentRef.current = content;
+      } catch {
+        // Intentionally swallow errors to prevent uncaught promise rejections.
+        // The caller (e.g., useNote/updateNote) is responsible for user-visible error handling.
+      }
     }, AUTO_SAVE_DELAY_MS) as unknown as NodeJS.Timeout;
 
     return () => {

@@ -38,32 +38,22 @@ export function useRealtimeNote(onRemoteUpdate?: () => void) {
 
   useEffect(() => {
     if (!pb) {
-      console.log('[PB] No PocketBase URL configured');
       return;
     }
     if (!note?.id) {
-      console.log('[PB] No note.id yet');
       return;
     }
     if (passphrase.length < 3) {
-      console.log('[PB] Passphrase too short');
       return;
     }
-
-    console.log('[PB] Subscribing to notes collection, filtering for note:', note.id);
 
     // Subscribe to all changes in the notes collection
     // We filter client-side for our specific note
     const unsubscribePromise = pb.collection('notes').subscribe('*', (e: RecordSubscription<Record<string, unknown>>) => {
-      console.log('[PB] Event received:', e.action, e.record?.id);
-      
       // Filter to only our note
       if (e.record?.id !== note.id) {
-        console.log('[PB] Event for different note, ignoring');
         return;
       }
-
-      console.log('[PB] Event matches our note!');
       
       if (e.record?.updated) {
         const serverUpdated = new Date(e.record.updated as string);
@@ -72,7 +62,6 @@ export function useRealtimeNote(onRemoteUpdate?: () => void) {
         if (lastLocalUpdateRef.current) {
           const diff = Math.abs(serverUpdated.getTime() - lastLocalUpdateRef.current.getTime());
           if (diff < 2000) {
-            console.log('[PB] Ignoring self-triggered event (timestamp match)');
             return;
           }
         }
@@ -81,10 +70,8 @@ export function useRealtimeNote(onRemoteUpdate?: () => void) {
       
       // Only show banner if user has local changes; otherwise just trigger silent update
       if (hasUnsavedChangesRef.current) {
-        console.log('[PB] User has unsaved changes, showing banner');
         setRemoteUpdateAvailable(true);
       } else {
-        console.log('[PB] No local changes, triggering silent update');
         onRemoteUpdateRef.current?.();
       }
     }).catch((err) => {

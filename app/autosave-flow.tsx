@@ -31,11 +31,12 @@ export default function AutosaveFlowScreen() {
           <ThemedText style={styles.bullet}>• Debounced save ~1s after you stop typing (configurable via EXPO_PUBLIC_AUTO_SAVE_DELAY_MS).</ThemedText>
           <ThemedText style={styles.bullet}>• PUT /notes upserts the note; no manual save needed.</ThemedText>
           <ThemedText style={styles.bullet}>• Disabled if the title is shorter than 3 characters.</ThemedText>
+          <ThemedText style={styles.bullet}>• When we reload from server, autosave baseline is synced so we don’t re-save server content back to the server.</ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Realtime updates</ThemedText>
-          <ThemedText style={styles.bullet}>• After loading a note, the app subscribes to PocketBase SSE topic notes/&lt;note.id&gt;.</ThemedText>
+          <ThemedText style={styles.bullet}>• Uses PocketBase JS SDK: subscribe to notes/* and filter client-side for your note.</ThemedText>
           <ThemedText style={styles.bullet}>• When the server reports an update, we set a “remote update” flag.</ThemedText>
           <ThemedText style={styles.bullet}>• If you have no local edits, we auto-reload to the latest server content.</ThemedText>
           <ThemedText style={styles.bullet}>• If you have local edits, we do NOT overwrite; we just show the badge/banner.</ThemedText>
@@ -44,8 +45,8 @@ export default function AutosaveFlowScreen() {
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Collision handling</ThemedText>
           <ThemedText style={styles.bullet}>• Remote flag pauses autosave to avoid clobbering a newer server version.</ThemedText>
-          <ThemedText style={styles.bullet}>• You choose: Reload (discard local edits), Overwrite (save your edits anyway), or Copy & Reload (back up your text, then reload).</ThemedText>
-          <ThemedText style={styles.bullet}>• Reload shows the existing “discard local edits?” confirmation.</ThemedText>
+          <ThemedText style={styles.bullet}>• You choose: “Use theirs” (reload server content) or “Keep mine” (overwrite server with your edits).</ThemedText>
+          <ThemedText style={styles.bullet}>• If you have no unsaved edits, we auto-reload; if you do, we never discard them automatically.</ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.section}>
@@ -56,9 +57,9 @@ export default function AutosaveFlowScreen() {
 
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>TL;DR safety</ThemedText>
-          <ThemedText style={styles.bullet}>• Remote update? Autosave pauses until you pick Reload or Overwrite.</ThemedText>
-          <ThemedText style={styles.bullet}>• You’re always asked before discarding local edits.</ThemedText>
-          <ThemedText style={styles.bullet}>• Copy & Reload gives you a quick backup of your text.</ThemedText>
+          <ThemedText style={styles.bullet}>• Remote update? Autosave pauses until you pick Use theirs or Keep mine.</ThemedText>
+          <ThemedText style={styles.bullet}>• We never discard your local edits without your consent.</ThemedText>
+          <ThemedText style={styles.bullet}>• Realtime stays light: collection subscription, client-side filter, and ignore self-triggered events.</ThemedText>
         </ThemedView>
       </ScrollView>
     </ThemedView>

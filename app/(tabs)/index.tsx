@@ -74,6 +74,7 @@ export default function HomeScreen() {
     setPassphraseVisible,
     noteContent,
     setNoteContent,
+    originalContent,
     note,
     imageUri,
     setImageUri,
@@ -105,8 +106,13 @@ export default function HomeScreen() {
   useRealtimeNote();
 
   // Pass originalContent so autosave knows when content was loaded from server (not user edit)
-  const { originalContent } = useNoteContext();
-  useAutoSave(effectiveNoteContent, passphrase, updateNote, note !== null && !remoteUpdateAvailable, originalContent);
+  useAutoSave(
+    effectiveNoteContent,
+    passphrase,
+    updateNote,
+    note !== null && !remoteUpdateAvailable,
+    originalContent
+  );
 
   const handleImagePress = () => {
     setIsThumbnailBlurred(false); // Clear blur when opening viewer
@@ -309,8 +315,8 @@ export default function HomeScreen() {
         backgroundColor: 'transparent',
       }]}>
         <SeoHead
-          title="Instant Public Boards & Private Vaults"
-          description="Create notes instantly. Use short titles for public boards (jokes, ads, chat) or complex titles for private, encrypted vaults. No signup."
+          title="Secret Notes — Instant, Encrypted, No Signup"
+          description="Drop a title, start typing. Short titles create public boards; complex titles create private, encrypted vaults with realtime sync and collision-safe autosave. No signup."
         />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

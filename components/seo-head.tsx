@@ -1,5 +1,5 @@
-import React from 'react';
 import Head from 'expo-router/head';
+import React from 'react';
 
 interface SeoHeadProps {
   title: string;
@@ -10,14 +10,28 @@ interface SeoHeadProps {
 }
 
 export function SeoHead({ title, description, image, url, keywords }: SeoHeadProps) {
-  const siteName = "Secret Notes Mobile";
-  const defaultDescription = "Instantly create notes by entering a title. Use short titles for public boards or complex ones for private, encrypted vaults. No signup required.";
-  const defaultImage = "/assets/images/icon.png"; // We'll need to ensure this works on web
+  const siteName = "Secret Notes";
+  const defaultDescription =
+    "Instant, zero-signup notes. Short titles create public boards; complex titles create private, encrypted vaults with realtime sync.";
+  const defaultImage = "/assets/images/icon.png"; // Ensure this resolves on web deploy
   
   const fullTitle = `${title} | ${siteName}`;
   const metaDescription = description || defaultDescription;
   const ogImage = image || defaultImage;
-  const metaKeywords = keywords || "secure notes, encrypted storage, public board, pastebin, anonymous chat, dead drop, zero knowledge, privacy";
+  const metaKeywords =
+    keywords ||
+    [
+      "secure notes",
+      "encrypted notes",
+      "realtime notes",
+      "secret notes",
+      "zero knowledge",
+      "private pastebin",
+      "anonymous notes",
+      "encrypted messaging",
+      "dead drop",
+      "no signup",
+    ].join(", ");
 
   const schemaData = {
     "@context": "https://schema.org",

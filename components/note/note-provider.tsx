@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { NoteResponse, ImageUploadResponse } from '@/types';
+import { ImageUploadResponse, NoteResponse } from '@/types';
+import React, { createContext, ReactNode, useCallback, useContext, useState } from 'react';
 
 interface NoteContextType {
   passphrase: string;
@@ -31,6 +31,10 @@ interface NoteContextType {
   setLastSavedAt: (date: Date | null) => void;
   isImageViewerOpen: boolean;
   setIsImageViewerOpen: (open: boolean) => void;
+  remoteUpdateAvailable: boolean;
+  setRemoteUpdateAvailable: (flag: boolean) => void;
+  remoteUpdatedAt: Date | null;
+  setRemoteUpdatedAt: (date: Date | null) => void;
   clearNote: () => void;
 }
 
@@ -51,6 +55,8 @@ export function NoteProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [remoteUpdateAvailable, setRemoteUpdateAvailable] = useState(false);
+  const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<Date | null>(null);
 
   const hasUnsavedChanges = noteContent !== originalContent;
 
@@ -62,6 +68,8 @@ export function NoteProvider({ children }: { children: ReactNode }) {
     setImageMetadata(null);
     setError(null);
     setLastSavedAt(null);
+    setRemoteUpdateAvailable(false);
+    setRemoteUpdatedAt(null);
   }, []);
 
   const value: NoteContextType = {
@@ -94,6 +102,10 @@ export function NoteProvider({ children }: { children: ReactNode }) {
     setLastSavedAt,
     isImageViewerOpen,
     setIsImageViewerOpen,
+    remoteUpdateAvailable,
+    setRemoteUpdateAvailable,
+    remoteUpdatedAt,
+    setRemoteUpdatedAt,
     clearNote,
   };
 

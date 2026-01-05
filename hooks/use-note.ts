@@ -1,11 +1,12 @@
 import { useNoteContext } from '@/components/note/note-provider';
-import { fetchNote, handleApiError, saveNote } from '@/utils/api-client';
+import { fetchNote, handleApiError, saveNote, VersionConflictError } from '@/utils/api-client';
 import { useCallback } from 'react';
 import { Alert } from 'react-native';
 
 export function useNote() {
   const {
     passphrase,
+    note,
     setNote,
     noteContent,
     setNoteContent,
@@ -15,6 +16,8 @@ export function useNote() {
     setError,
     setLastSavedAt,
     clearNote,
+    setRemoteUpdateAvailable,
+    setRemoteUpdatedAt,
   } = useNoteContext();
 
   const loadNote = useCallback(async (signal?: AbortSignal) => {
@@ -31,6 +34,12 @@ export function useNote() {
       setNote(fetchedNote);
       setNoteContent(fetchedNote.message);
       setOriginalContent(fetchedNote.message);
+      setRemoteUpdateAvailable(false);
+      if (fetchedNote.updated) {
+        setRemoteUpdatedAt(new Date(fetchedNote.updated));
+      } else {
+        setRemoteUpdatedAt(null);
+      }
     } catch (error) {
       // Silently ignore aborted requests - user typed again while loading
       if (error instanceof Error && error.name === 'AbortError') {
@@ -54,18 +63,28 @@ export function useNote() {
     setError(null);
 
     try {
-      const updatedNote = await saveNote(passphrase, message);
+      // Pass current version for optimistic locking
+      const updatedNote = await saveNote(passphrase, message, note?.version);
       setNote(updatedNote);
       setOriginalContent(message);
       setLastSavedAt(new Date());
+      setRemoteUpdateAvailable(false);
+      if (updatedNote.updated) {
+        setRemoteUpdatedAt(new Date(updatedNote.updated));
+      }
     } catch (error) {
+      // On version conflict, set remote update flag so user sees the conflict UI
+      if (error instanceof VersionConflictError) {
+        setRemoteUpdateAvailable(true);
+      }
       const errorMessage = handleApiError(error);
       setError(errorMessage);
       Alert.alert('Error Saving Note', errorMessage);
+      throw error; // Re-throw so callers know save failed
     } finally {
       setIsSavingNote(false);
     }
-  }, [passphrase, setNote, setOriginalContent, setIsSavingNote, setError, setLastSavedAt]);
+  }, [passphrase, note?.version, setNote, setOriginalContent, setIsSavingNote, setError, setLastSavedAt, setRemoteUpdateAvailable, setRemoteUpdatedAt]);
 
   return {
     loadNote,

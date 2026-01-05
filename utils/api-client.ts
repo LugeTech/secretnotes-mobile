@@ -13,10 +13,18 @@ export class ApiError extends Error {
   constructor(
     public statusCode: number,
     message: string,
-    public details?: any
+    public details?: any,
+    public currentVersion?: number
   ) {
     super(message);
     this.name = 'ApiError';
+  }
+}
+
+export class VersionConflictError extends ApiError {
+  constructor(public currentVersion: number) {
+    super(409, 'version_conflict', undefined, currentVersion);
+    this.name = 'VersionConflictError';
   }
 }
 
@@ -48,10 +56,16 @@ export async function fetchNote(passphrase: string, signal?: AbortSignal): Promi
 
 export async function saveNote(
   passphrase: string,
-  message: string
+  message: string,
+  version?: number
 ): Promise<NoteResponse> {
   if (passphrase.length < 3) {
     throw new ApiError(400, 'Title must be at least 3 characters long');
+  }
+
+  const body: { message: string; version?: number } = { message };
+  if (version !== undefined) {
+    body.version = version;
   }
 
   const response = await fetch(`${API_BASE_URL}/notes`, {
@@ -60,8 +74,14 @@ export async function saveNote(
       'Content-Type': 'application/json',
       'X-Passphrase': passphrase
     },
-    body: JSON.stringify({ message })
+    body: JSON.stringify(body)
   });
+
+  // Handle 409 version conflict specially
+  if (response.status === 409) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new VersionConflictError(errorData.currentVersion ?? 0);
+  }
 
   return handleResponse<NoteResponse>(response);
 }
@@ -166,6 +186,10 @@ export async function deleteImage(passphrase: string): Promise<void> {
 }
 
 export function handleApiError(error: unknown): string {
+  if (error instanceof VersionConflictError) {
+    return 'Someone else edited this note. Reload to see their changes.';
+  }
+
   if (error instanceof ApiError) {
     switch (error.statusCode) {
       case 400:

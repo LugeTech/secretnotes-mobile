@@ -1,9 +1,9 @@
-import React from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import React from 'react';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 
 interface InfoModalProps {
   visible: boolean;
@@ -13,13 +13,13 @@ interface InfoModalProps {
 }
 
 export function InfoModal({ visible, title, message, onClose }: InfoModalProps) {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const borderColor = useThemeColor({ light: '#E5E7EB', dark: '#374151' }, 'icon');
+  const backgroundColor = useThemeColor({}, 'background') as string;
+  const textColor = useThemeColor({}, 'text') as string;
+  const borderColor = useThemeColor({ light: '#E5E7EB', dark: '#374151' }, 'icon') as string;
   const overlayColor = useThemeColor(
     { light: 'rgba(0, 0, 0, 0.5)', dark: 'rgba(0, 0, 0, 0.7)' },
     'background'
-  );
+  ) as string;
 
   return (
     <Modal

@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
-import { StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
 import { ExternalLink } from '@/components/external-link';
+import { SeoHead } from '@/components/seo-head';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
 import { router } from 'expo-router';
-import { SeoHead } from '@/components/seo-head';
 
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
@@ -83,17 +83,28 @@ export default function TabTwoScreen() {
        </ThemedView>
  
        <ThemedView 
-         style={styles.section}
-         lightColor="rgba(240, 220, 230, 0.5)"
-         darkColor="rgba(120, 90, 100, 0.2)"
-       >
-         <ThemedText
-           style={styles.link}
-           onPress={() => router.push('/facts-for-nerds')}
-         >
-           Facts for Nerds →
-         </ThemedText>
-       </ThemedView>
+        style={styles.section}
+        lightColor="rgba(240, 220, 230, 0.5)"
+        darkColor="rgba(120, 90, 100, 0.2)"
+      >
+        <ThemedText
+          style={styles.link}
+          onPress={() => router.push('/facts-for-nerds')}
+        >
+          Facts for Nerds →
+        </ThemedText>
+      </ThemedView>
+
+      <ThemedView 
+        style={[styles.section, { backgroundColor: 'transparent', marginTop: 6 }]}
+      >
+        <ThemedText
+          style={[styles.link, { opacity: 0.55, fontSize: 14 }]}
+          onPress={() => router.push('/autosave-flow')}
+        >
+          How autosave & realtime work →
+        </ThemedText>
+      </ThemedView>
 
        <ThemedView 
          style={styles.section}

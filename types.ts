@@ -2,6 +2,7 @@ export interface NoteResponse {
   id: string;
   message: string;
   hasImage: boolean;
+  version: number;
   created: string;
   updated: string;
 }
@@ -18,6 +19,7 @@ export interface ImageUploadResponse {
 
 export interface ErrorResponse {
   error: string;
+  currentVersion?: number;
 }
 
 export interface AppState {

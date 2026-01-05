@@ -1,6 +1,5 @@
 import { useEntranceAnimation } from "@/hooks/use-entrance-animation";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
@@ -49,43 +48,46 @@ export function WelcomeScreen() {
           </ThemedText>
         </View>
 
-        <View style={styles.cardsContainer}>
-          <Animated.View style={[styles.card, { backgroundColor: cardBg, opacity: animations[1].opacity, transform: animations[1].transform }]}>
-            <View style={[styles.iconCircle, { backgroundColor: `${tintColor}20` }]}>
-              <IconSymbol name="globe" size={24} color={tintColor} />
-            </View>
-            <View style={styles.cardTextContainer}>
-              <ThemedText style={styles.cardTitle}>Public Boards</ThemedText>
-              <ThemedText style={styles.cardDescription}>
-                Simple titles for sharing jokes, ads, or public chats.
-              </ThemedText>
-            </View>
-          </Animated.View>
+        <Animated.View style={[styles.introContainer, { opacity: animations[1].opacity, transform: animations[1].transform }]}>
+          <ThemedText style={styles.introText}>
+            Just pick a word or phrase and start writing. That's your key — anyone with the same passphrase can see that note.
+          </ThemedText>
+        </Animated.View>
 
-          <Animated.View style={[styles.card, { backgroundColor: cardBg, opacity: animations[2].opacity, transform: animations[2].transform }]}>
-            <View style={[styles.iconCircle, { backgroundColor: "#8b5cf620" }]}>
-              <IconSymbol name="shield.fill" size={24} color="#8b5cf6" />
-            </View>
-            <View style={styles.cardTextContainer}>
-              <ThemedText style={styles.cardTitle}>Private Vaults</ThemedText>
-              <ThemedText style={styles.cardDescription}>
-                Unique titles for secure, encrypted notes only you can open.
-              </ThemedText>
-            </View>
-          </Animated.View>
+        <Animated.View style={[styles.divider, { opacity: animations[2].opacity }]}>
+          <ThemedText style={styles.dividerText}>Quick examples</ThemedText>
+          <View style={styles.dividerLine} />
+        </Animated.View>
 
-          <Animated.View style={[styles.card, { backgroundColor: cardBg, opacity: animations[3].opacity, transform: animations[3].transform }]}>
-            <View style={[styles.iconCircle, { backgroundColor: "#10b98120" }]}>
-              <IconSymbol name="photo.fill" size={24} color="#10b981" />
-            </View>
-            <View style={styles.cardTextContainer}>
-              <ThemedText style={styles.cardTitle}>Instant Media</ThemedText>
-              <ThemedText style={styles.cardDescription}>
-                Attach one secure image to every note you create.
-              </ThemedText>
-            </View>
-          </Animated.View>
-        </View>
+        <Animated.View style={[styles.examplesContainer, { opacity: animations[3].opacity, transform: animations[3].transform }]}>
+          <View style={styles.exampleItem}>
+            <ThemedText style={styles.examplePassphrase}>"hello"</ThemedText>
+            <ThemedText style={styles.exampleDescription}>
+              A quick public note anyone can read
+            </ThemedText>
+          </View>
+
+          <View style={styles.exampleItem}>
+            <ThemedText style={styles.examplePassphrase}>"pizza-friday"</ThemedText>
+            <ThemedText style={styles.exampleDescription}>
+              Share lunch plans with your team
+            </ThemedText>
+          </View>
+
+          <View style={styles.exampleItem}>
+            <ThemedText style={styles.examplePassphrase}>"my-secret-journal-2024"</ThemedText>
+            <ThemedText style={styles.exampleDescription}>
+              Private thoughts, encrypted and secure
+            </ThemedText>
+          </View>
+
+          <View style={styles.exampleItem}>
+            <ThemedText style={styles.examplePassphrase}>"family-photos"</ThemedText>
+            <ThemedText style={styles.exampleDescription}>
+              Share pictures with your family
+            </ThemedText>
+          </View>
+        </Animated.View>
 
         <Animated.View style={[styles.hintContainer, { opacity: animations[4].opacity, transform: animations[4].transform }]}>
           <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
@@ -97,26 +99,14 @@ export function WelcomeScreen() {
 
         {!isNativeMobile && (
           <View style={styles.linksSection}>
-            <Pressable onPress={() => router.push("/COMING_SOON")} style={styles.gradientButtonContainer}>
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.gradientButton}
-              >
-                <ThemedText style={styles.linkText}>📱 App Store</ThemedText>
-              </LinearGradient>
+            <Pressable onPress={() => router.push("/COMING_SOON")} style={[styles.storeButton, { borderColor: tintColor }]}>
+              <IconSymbol name="chevron.right" size={20} color={tintColor} />
+              <ThemedText style={[styles.linkText, { color: tintColor }]}>Download for iOS</ThemedText>
             </Pressable>
 
-            <Pressable onPress={() => router.push("/COMING_SOON")} style={styles.gradientButtonContainer}>
-              <LinearGradient
-                colors={['#10b981', '#3b82f6']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.gradientButton}
-              >
-                <ThemedText style={styles.linkText}>🤖 Play Store</ThemedText>
-              </LinearGradient>
+            <Pressable onPress={() => router.push("/COMING_SOON")} style={[styles.storeButton, { borderColor: tintColor }]}>
+              <IconSymbol name="chevron.right" size={20} color={tintColor} />
+              <ThemedText style={[styles.linkText, { color: tintColor }]}>Download for Android</ThemedText>
             </Pressable>
           </View>
         )}
@@ -154,49 +144,49 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: '500',
   },
-  cardsContainer: {
-    gap: 12,
+  introContainer: {
+    paddingHorizontal: 8,
   },
-  card: {
-    flexDirection: 'row',
-    padding: 16,
-    borderRadius: 16,
+  introText: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
+    opacity: 0.9,
+  },
+  divider: {
     alignItems: 'center',
+    gap: 8,
+    marginVertical: 8,
+  },
+  dividerText: {
+    fontSize: 13,
+    opacity: 0.5,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  dividerLine: {
+    height: 1,
+    width: '100%',
+    opacity: 0.1,
+  },
+  examplesContainer: {
     gap: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-      },
-    }),
+    paddingHorizontal: 8,
   },
-  iconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+  exampleItem: {
+    gap: 4,
   },
-  cardTextContainer: {
-    flex: 1,
-    gap: 2,
+  examplePassphrase: {
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  cardDescription: {
+  exampleDescription: {
     fontSize: 14,
     opacity: 0.7,
     lineHeight: 20,
+    paddingLeft: 4,
   },
   hintContainer: {
     alignItems: 'center',
@@ -215,20 +205,22 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 20,
   },
-  gradientButtonContainer: {
+  storeButton: {
     flex: 1,
     maxWidth: 180,
-  },
-  gradientButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    borderWidth: 2,
+    backgroundColor: 'transparent',
   },
   linkText: {
-    color: "white",
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "600",
     textAlign: "center",
   },
 });

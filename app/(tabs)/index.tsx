@@ -1,3 +1,4 @@
+import Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActionSheetIOS, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
@@ -18,6 +19,7 @@ import { WelcomeScreen } from '@/components/welcome-screen';
 import { useAutoSave } from '@/hooks/use-auto-save';
 import { useImage } from '@/hooks/use-image';
 import { useNote } from '@/hooks/use-note';
+import { useRealtimeNote } from '@/hooks/use-realtime-note';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { formatFileSize } from '@/utils/format';
 import { getPassphraseColor, getPassphraseStrength, isCommonPhrase } from '@/utils/passphrase';
@@ -89,6 +91,8 @@ export default function HomeScreen() {
     setError,
     isImageViewerOpen,
     setIsImageViewerOpen,
+    remoteUpdateAvailable,
+    setRemoteUpdateAvailable,
     clearNote,
   } = useNoteContext();
 
@@ -99,7 +103,9 @@ export default function HomeScreen() {
   const effectiveNoteContent =
     noteContent === DEFAULT_WELCOME_MESSAGE ? '' : noteContent;
 
-  useAutoSave(effectiveNoteContent, passphrase, updateNote, note !== null);
+  useRealtimeNote();
+
+  useAutoSave(effectiveNoteContent, passphrase, updateNote, note !== null && !remoteUpdateAvailable);
 
   const handleImagePress = () => {
     setIsThumbnailBlurred(false); // Clear blur when opening viewer
@@ -264,6 +270,34 @@ export default function HomeScreen() {
     runReload();
   };
 
+  // Auto-refresh if a remote update arrives and we have no local edits to protect
+  useEffect(() => {
+    if (remoteUpdateAvailable && !hasUnsavedChanges) {
+      runReload();
+    }
+  }, [remoteUpdateAvailable, hasUnsavedChanges]);
+
+  const handleOverwriteRemote = async () => {
+    try {
+      await updateNote(effectiveNoteContent);
+      // Only clear flag if save succeeded (no exception thrown)
+      setRemoteUpdateAvailable(false);
+    } catch {
+      // updateNote already shows an alert on error, flag stays true
+    }
+  };
+
+  const handleCopyAndReload = async () => {
+    try {
+      await Clipboard.setStringAsync(effectiveNoteContent);
+      Alert.alert('Copied', 'Your local text has been copied to clipboard.');
+      setRemoteUpdateAvailable(false);
+      runReload();
+    } catch {
+      Alert.alert('Copy Failed', 'Could not copy text to clipboard. Your local changes are preserved.');
+    }
+  };
+
   return (
     <LinearGradient
       colors={(gradientColors && gradientColors.length >= 2 ? gradientColors : ['#ffffff', '#f1f5f9']) as unknown as [string, string, ...string[]]}
@@ -307,6 +341,26 @@ export default function HomeScreen() {
               <ThemedText style={[styles.progressText, { color: progressTextColor }]}>
                 {compressionProgress}
               </ThemedText>
+            </ThemedView>
+          )}
+
+          {/* Remote update banner */}
+          {remoteUpdateAvailable && (
+            <ThemedView style={[styles.remoteBanner, { backgroundColor: progressBannerBackground }]}>
+              <ThemedText style={[styles.remoteBannerText, { color: progressTextColor }]}>
+                Updated on server. Reload to view or overwrite.
+              </ThemedText>
+              <View style={styles.remoteBannerActions}>
+                <Pressable onPress={handleReloadNote} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
+                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Reload</ThemedText>
+                </Pressable>
+                <Pressable onPress={handleOverwriteRemote} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
+                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Overwrite</ThemedText>
+                </Pressable>
+                <Pressable onPress={handleCopyAndReload} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
+                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Copy & Reload</ThemedText>
+                </Pressable>
+              </View>
             </ThemedView>
           )}
 
@@ -419,23 +473,26 @@ export default function HomeScreen() {
                 )}
               </View>
               <View style={styles.saveSection}>
-                <AnimatedPressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Reload note"
-                  onPress={handleReloadNote}
-                  disabled={isLoadingNote || passphrase.length < 3}
-                  hitSlop={10}
-                  style={[
-                    styles.reloadButton,
-                    { opacity: isLoadingNote || passphrase.length < 3 ? 0.5 : 1 },
-                  ]}
-                >
-                  {isLoadingNote ? (
-                    <ActivityIndicator size="small" color={tintColor} />
-                  ) : (
-                    <IconSymbol name="arrow.clockwise" size={18} color={tintColor} />
-                  )}
-                </AnimatedPressable>
+                <View>
+                  <AnimatedPressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Reload note"
+                    onPress={handleReloadNote}
+                    disabled={isLoadingNote || passphrase.length < 3}
+                    hitSlop={10}
+                    style={[
+                      styles.reloadButton,
+                      { opacity: isLoadingNote || passphrase.length < 3 ? 0.5 : 1 },
+                    ]}
+                  >
+                    {isLoadingNote ? (
+                      <ActivityIndicator size="small" color={tintColor} />
+                    ) : (
+                      <IconSymbol name="arrow.clockwise" size={18} color={tintColor} />
+                    )}
+                  </AnimatedPressable>
+                  {remoteUpdateAvailable && <View style={[styles.reloadDot, { backgroundColor: tintColor }]} />}
+                </View>
                 {note && (
                   <SaveIndicator
                     isSaving={isSavingNote}
@@ -683,6 +740,40 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.08)',
     backgroundColor: 'rgba(0,0,0,0.04)',
+  },
+  reloadDot: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  remoteBanner: {
+    flexDirection: 'column',
+    gap: 8,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 8,
+  },
+  remoteBannerText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  remoteBannerActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  remoteActionBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  remoteActionText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   noteSection: {
     flex: 1,

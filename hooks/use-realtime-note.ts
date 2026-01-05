@@ -30,41 +30,69 @@ export function useRealtimeNote() {
   const lastLocalUpdateRef = useRef<Date | null>(null);
 
   useEffect(() => {
-    if (!REALTIME_URL) return;
-    if (!note?.id) return;
-    if (passphrase.length < 3) return;
+    if (!REALTIME_URL) {
+      console.log('[SSE] No REALTIME_URL configured');
+      return;
+    }
+    if (!note?.id) {
+      console.log('[SSE] No note.id yet');
+      return;
+    }
+    if (passphrase.length < 3) {
+      console.log('[SSE] Passphrase too short');
+      return;
+    }
 
+    console.log('[SSE] Connecting to:', REALTIME_URL);
     const source = new EventSource(REALTIME_URL);
     eventSourceRef.current = source;
 
     const handleConnect = async (event: PBMessageEvent) => {
       try {
+        console.log('[SSE] PB_CONNECT received:', event.data);
         const data = JSON.parse(event.data);
         const clientId = data.clientId as string | undefined;
-        if (!clientId) return;
+        if (!clientId) {
+          console.warn('[SSE] No clientId in connect event');
+          return;
+        }
         clientIdRef.current = clientId;
 
-        // Subscribe to this specific note record
-        await fetch(REALTIME_URL, {
+        // Subscribe to the entire notes collection (not individual record)
+        // PocketBase uses "notes" for collection, "notes/ID" for single record
+        const subscription = 'notes'; // Subscribe to all notes changes
+        console.log('[SSE] Subscribing with clientId:', clientId, 'to:', subscription);
+        
+        const response = await fetch(REALTIME_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             clientId,
-            subscriptions: [`notes/${note.id}`],
+            subscriptions: [subscription],
           }),
         });
+        console.log('[SSE] Subscribe response status:', response.status);
       } catch (error) {
-        console.warn('Realtime connect/subscribe failed', error);
+        console.warn('[SSE] Realtime connect/subscribe failed', error);
       }
     };
 
     const handleEvent = (event: PBMessageEvent) => {
       try {
+        console.log('[SSE] PB_EVENT received:', event.data);
         const payload = JSON.parse(event.data);
         const { record } = payload || {};
-        if (!record?.id) return;
-        if (record.id !== note.id) return; // extra guard
+        if (!record?.id) {
+          console.log('[SSE] No record.id in event');
+          return;
+        }
+        // Filter to only our note
+        if (record.id !== note.id) {
+          console.log('[SSE] Event for different note:', record.id, 'vs', note.id);
+          return;
+        }
 
+        console.log('[SSE] Event matches our note!');
         if (record.updated) {
           const serverUpdated = new Date(record.updated);
           // Filter out self-triggered events: if the server timestamp matches
@@ -72,15 +100,16 @@ export function useRealtimeNote() {
           if (lastLocalUpdateRef.current) {
             const diff = Math.abs(serverUpdated.getTime() - lastLocalUpdateRef.current.getTime());
             if (diff < 2000) {
-              // This is likely our own save, ignore
+              console.log('[SSE] Ignoring self-triggered event (timestamp match)');
               return;
             }
           }
           setRemoteUpdatedAt(serverUpdated);
         }
+        console.log('[SSE] Setting remoteUpdateAvailable = true');
         setRemoteUpdateAvailable(true);
       } catch (error) {
-        console.warn('Realtime event parse failed', error);
+        console.warn('[SSE] Realtime event parse failed', error);
       }
     };
 

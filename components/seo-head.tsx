@@ -12,7 +12,7 @@ interface SeoHeadProps {
 export function SeoHead({ title, description, image, url, keywords }: SeoHeadProps) {
   const siteName = "Secret Notes";
   const defaultDescription =
-    "Instant, zero-signup notes. Short titles create public boards; complex titles create private, encrypted vaults with realtime sync.";
+    "Instant, zero-signup notes. Short titles create public boards; strong titles create private, encrypted vaults with realtime sync—start typing to save.";
   const defaultImage = "https://secretnotez.com/og-image.webp"; // WebP for smaller file size
   
   const fullTitle = `${title} | ${siteName}`;

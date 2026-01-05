@@ -66,6 +66,7 @@ export default function HomeScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const strengthFadeAnim = useRef(new Animated.Value(0)).current;
   const strengthScaleAnim = useRef(new Animated.Value(0.9)).current;
+  const highlightAnim = useRef(new Animated.Value(0)).current; // For remote update highlight
 
   const {
     passphrase,
@@ -96,7 +97,7 @@ export default function HomeScreen() {
     clearNote,
   } = useNoteContext();
 
-  const { loadNote, updateNote, forceUpdateNote } = useNote();
+  const { loadNote, silentReload, updateNote, forceUpdateNote } = useNote();
   const { loadImage, pickAndUploadImage, takeAndUploadPhoto, compressionProgress } = useImage();
 
   const DEFAULT_WELCOME_MESSAGE = 'Welcome to your new secure note!';
@@ -278,11 +279,20 @@ export default function HomeScreen() {
   };
 
   // Auto-refresh if a remote update arrives and we have no local edits to protect
+  // Use silentReload to avoid flicker (no loading spinner)
   useEffect(() => {
     if (remoteUpdateAvailable && !hasUnsavedChanges) {
-      runReload();
+      silentReload().then(() => {
+        // Pulse highlight animation to show content updated
+        highlightAnim.setValue(1);
+        Animated.timing(highlightAnim, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: false,
+        }).start();
+      });
     }
-  }, [remoteUpdateAvailable, hasUnsavedChanges]);
+  }, [remoteUpdateAvailable, hasUnsavedChanges, silentReload, highlightAnim]);
 
   // Direct reload for banner button - skips confirmation since user already sees the conflict banner
   const handleBannerReload = () => {
@@ -512,19 +522,30 @@ export default function HomeScreen() {
             ) : isLoadingNote ? (
               <NoteSkeleton />
             ) : (
-              <TextInput
-                value={effectiveNoteContent}
-                onChangeText={setNoteContent}
-                placeholder="Start typing your note..."
-                placeholderTextColor="#9CA3AF"
-                editable={passphrase.length >= 3}
-                multiline
-                scrollEnabled
-                style={[styles.noteArea, { color: textColor }]}
-                textAlignVertical="top"
-                autoCorrect={false}
-                autoCapitalize="none"
-              />
+              <Animated.View
+                style={{
+                  flex: 1,
+                  borderRadius: 12,
+                  backgroundColor: highlightAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['transparent', 'rgba(34, 197, 94, 0.15)'], // Green highlight
+                  }),
+                }}
+              >
+                <TextInput
+                  value={effectiveNoteContent}
+                  onChangeText={setNoteContent}
+                  placeholder="Start typing your note..."
+                  placeholderTextColor="#9CA3AF"
+                  editable={passphrase.length >= 3}
+                  multiline
+                  scrollEnabled
+                  style={[styles.noteArea, { color: textColor }]}
+                  textAlignVertical="top"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+              </Animated.View>
             )}
           </Animated.View>
 

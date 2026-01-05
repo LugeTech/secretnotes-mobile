@@ -1,4 +1,3 @@
-import Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActionSheetIOS, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
@@ -294,16 +293,6 @@ export default function HomeScreen() {
     }
   };
 
-  const handleCopyAndReload = async () => {
-    try {
-      await Clipboard.setStringAsync(effectiveNoteContent);
-      Alert.alert('Copied', 'Your local text has been copied to clipboard.');
-      setRemoteUpdateAvailable(false);
-      runReload();
-    } catch {
-      Alert.alert('Copy Failed', 'Could not copy text to clipboard. Your local changes are preserved.');
-    }
-  };
 
   return (
     <LinearGradient
@@ -355,17 +344,14 @@ export default function HomeScreen() {
           {remoteUpdateAvailable && (
             <ThemedView style={[styles.remoteBanner, { backgroundColor: progressBannerBackground }]}>
               <ThemedText style={[styles.remoteBannerText, { color: progressTextColor }]}>
-                Updated on server. Reload to view or overwrite.
+                Someone else edited this note.
               </ThemedText>
               <View style={styles.remoteBannerActions}>
                 <Pressable onPress={handleBannerReload} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
-                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Reload</ThemedText>
+                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Use theirs</ThemedText>
                 </Pressable>
                 <Pressable onPress={handleOverwriteRemote} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
-                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Overwrite</ThemedText>
-                </Pressable>
-                <Pressable onPress={handleCopyAndReload} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
-                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Copy & Reload</ThemedText>
+                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Keep mine</ThemedText>
                 </Pressable>
               </View>
             </ThemedView>

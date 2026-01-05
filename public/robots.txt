@@ -3,4 +3,4 @@ Allow: /
 Disallow: /_expo/
 Disallow: /modal
 
-Sitemap: https://secretnotes.app/sitemap.xml
+Sitemap: https://secretnotez.com/sitemap.xml

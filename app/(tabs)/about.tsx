@@ -16,7 +16,7 @@ export default function TabTwoScreen() {
       <SeoHead 
         title="About & Use Cases" 
         description="Use Secret Notes for dead drops, puzzles, anonymous chat, public ads, or private storage. Your title determines visibility."
-        url="https://secretnotes.app/about"
+        url="https://secretnotez.com/about"
         keywords="dead drop, puzzle, riddle, anonymous chat, public board, pastebin, secure storage, encrypted note, private vault"
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>

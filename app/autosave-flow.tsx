@@ -36,7 +36,7 @@ export default function AutosaveFlowScreen() {
 
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Realtime updates</ThemedText>
-          <ThemedText style={styles.bullet}>• Uses PocketBase JS SDK: subscribe to notes/* and filter client-side for your note.</ThemedText>
+          <ThemedText style={styles.bullet}>• We subscribe to realtime updates for your note while you're editing.</ThemedText>
           <ThemedText style={styles.bullet}>• When the server reports an update, we set a “remote update” flag.</ThemedText>
           <ThemedText style={styles.bullet}>• If you have no local edits, we auto-reload to the latest server content.</ThemedText>
           <ThemedText style={styles.bullet}>• If you have local edits, we do NOT overwrite; we just show the badge/banner.</ThemedText>
@@ -59,7 +59,7 @@ export default function AutosaveFlowScreen() {
           <ThemedText style={styles.sectionTitle}>TL;DR safety</ThemedText>
           <ThemedText style={styles.bullet}>• Remote update? Autosave pauses until you pick Use theirs or Keep mine.</ThemedText>
           <ThemedText style={styles.bullet}>• We never discard your local edits without your consent.</ThemedText>
-          <ThemedText style={styles.bullet}>• Realtime stays light: collection subscription, client-side filter, and ignore self-triggered events.</ThemedText>
+          <ThemedText style={styles.bullet}>• Realtime updates are efficient and only notify you about your own note.</ThemedText>
         </ThemedView>
       </ScrollView>
     </ThemedView>

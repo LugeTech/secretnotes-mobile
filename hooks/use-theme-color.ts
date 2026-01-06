@@ -4,8 +4,8 @@
  */
 
 import { Colors } from '@/constants/theme';
+import { useThemeContext } from '@/contexts/theme-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useThemeToggle } from '@/hooks/use-theme-toggle';
 
 // Overload signatures for proper type inference
 export function useThemeColor(
@@ -22,19 +22,9 @@ export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light
 ): string | string[] {
-  const { preference } = useThemeToggle();
+  const { preference } = useThemeContext();
   const theme = useColorScheme(preference);
   const colorFromProps = props[theme];
-
-  if (__DEV__) {
-    console.log('[useThemeColor]', {
-      colorName,
-      preference,
-      theme,
-      hasOverride: !!colorFromProps,
-      value: colorFromProps ?? Colors[theme][colorName],
-    });
-  }
 
   const value = colorFromProps ?? Colors[theme][colorName];
   return value;

@@ -23,43 +23,73 @@ export default function AutosaveFlowScreen() {
           >
             Autosave & Realtime Flow
           </ThemedText>
-          <ThemedText style={styles.subtitle}>Nerd notes on sync and collisions</ThemedText>
+          <ThemedText style={styles.subtitle}>
+            How Secret Notes quietly keeps everything up to date
+          </ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Autosave</ThemedText>
-          <ThemedText style={styles.bullet}>• Debounced save ~1s after you stop typing (configurable via EXPO_PUBLIC_AUTO_SAVE_DELAY_MS).</ThemedText>
-          <ThemedText style={styles.bullet}>• PUT /notes upserts the note; no manual save needed.</ThemedText>
-          <ThemedText style={styles.bullet}>• Disabled if the title is shorter than 3 characters.</ThemedText>
-          <ThemedText style={styles.bullet}>• When we reload from server, autosave baseline is synced so we don’t re-save server content back to the server.</ThemedText>
+          <ThemedText style={styles.bullet}>• Saves your note a moment after you pause typing.</ThemedText>
+          <ThemedText style={styles.bullet}>• No save button to tap—everything just stays current.</ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Short titles are ignored so drafts don’t clutter your list.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • We only save what you wrote, never the same thing twice.
+          </ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Realtime updates</ThemedText>
-          <ThemedText style={styles.bullet}>• We subscribe to realtime updates for your note while you're editing.</ThemedText>
-          <ThemedText style={styles.bullet}>• When the server reports an update, we set a “remote update” flag.</ThemedText>
-          <ThemedText style={styles.bullet}>• If you have no local edits, we auto-reload to the latest server content.</ThemedText>
-          <ThemedText style={styles.bullet}>• If you have local edits, we do NOT overwrite; we just show the badge/banner.</ThemedText>
+          <ThemedText style={styles.sectionTitle}>Live updates</ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Secret Notes watches for changes while you have a note open.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • If something changes elsewhere, we gently let you know.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • No edits waiting on your device? We refresh instantly so you always see the newest version.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Working on something? We leave it alone and simply flag that there’s something new.
+          </ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Collision handling</ThemedText>
-          <ThemedText style={styles.bullet}>• Remote flag pauses autosave to avoid clobbering a newer server version.</ThemedText>
-          <ThemedText style={styles.bullet}>• You choose: “Use theirs” (reload server content) or “Keep mine” (overwrite server with your edits).</ThemedText>
-          <ThemedText style={styles.bullet}>• If you have no unsaved edits, we auto-reload; if you do, we never discard them automatically.</ThemedText>
+          <ThemedText style={styles.sectionTitle}>When two devices collide</ThemedText>
+          <ThemedText style={styles.bullet}>
+            • We pause autosave the moment another device makes a newer change.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • You get a clear choice: keep what you just wrote or load the other version.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • If nothing is pending on your side, we safely show the latest content right away.
+          </ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>What we don’t expose</ThemedText>
-          <ThemedText style={styles.bullet}>• No secret keys or decryption details are shown here.</ThemedText>
-          <ThemedText style={styles.bullet}>• Realtime payloads include hashes + encrypted blobs; decryption still requires your title.</ThemedText>
+          <ThemedText style={styles.sectionTitle}>Privacy first</ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Your notes are encrypted, and only your device holds the key details.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Even our live updates stay sealed until your app unlocks them.
+          </ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>TL;DR safety</ThemedText>
-          <ThemedText style={styles.bullet}>• Remote update? Autosave pauses until you pick Use theirs or Keep mine.</ThemedText>
-          <ThemedText style={styles.bullet}>• We never discard your local edits without your consent.</ThemedText>
-          <ThemedText style={styles.bullet}>• Realtime updates are efficient and only notify you about your own note.</ThemedText>
+          <ThemedText style={styles.sectionTitle}>Quick reassurance</ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Autosave only runs when it’s safe, and it waits if anything looks unsure.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Your writing is never tossed out or replaced without your tap.
+          </ThemedText>
+          <ThemedText style={styles.bullet}>
+            • Notifications are minimal and only about the note you’re working on.
+          </ThemedText>
         </ThemedView>
       </ScrollView>
     </ThemedView>

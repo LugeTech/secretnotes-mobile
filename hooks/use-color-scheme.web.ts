@@ -1,43 +1,44 @@
 import { useEffect, useState } from 'react';
-import { useColorScheme as useRNColorScheme } from 'react-native';
 import { ThemePreference } from './use-theme-toggle';
 
 /**
  * Enhanced color scheme hook that supports theme toggle for web.
- * To support static rendering, this value needs to be re-calculated on the client side.
+ * Listens for system theme changes via matchMedia.
  * @param override - Optional theme preference override ('light', 'dark', or 'system')
  * @returns 'light' or 'dark'
  */
 export function useColorScheme(override?: ThemePreference) {
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const [systemScheme, setSystemScheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  });
 
   useEffect(() => {
-    setHasHydrated(true);
-  }, []);
+    if (typeof window === 'undefined' || !window.matchMedia) return;
 
-  const systemScheme = useRNColorScheme();
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemScheme(e.matches ? 'dark' : 'light');
+    };
+
+    // Listen for system theme changes
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
 
   // Handle explicit light/dark preference
   if (override === 'light' || override === 'dark') {
-    if (__DEV__) {
-      console.log('[useColorScheme.web] Using override:', override);
-    }
     return override;
   }
 
   // For 'system' or undefined, return the system preference
-  if (hasHydrated) {
-    const result = systemScheme ?? 'light';
-    if (__DEV__) {
-      console.log('[useColorScheme.web] Using system preference:', result, '(hasHydrated: true)');
-    }
-    return result;
-  }
-
-  if (__DEV__) {
-    console.log('[useColorScheme.web] Not hydrated yet, returning light');
-  }
-  return 'light';
+  return systemScheme;
 }
 
 // Export the original hook for backward compatibility

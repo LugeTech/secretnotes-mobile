@@ -12,6 +12,7 @@ import { ThemedView } from '@/components/themed-view';
 import { AnimatedPressable } from '@/components/ui/animated-pressable';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import ImageAttachmentSection from '@/components/ui/image-attachment-section';
+import { useThemeToggle } from '@/hooks/use-theme-toggle';
 import { InfoModal } from '@/components/ui/info-modal';
 import { NoteSkeleton } from '@/components/ui/skeleton-loader';
 import { WelcomeScreen } from '@/components/welcome-screen';
@@ -25,6 +26,7 @@ import { useRealtimeNote } from '../../hooks/use-realtime-note';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const { preference, setThemePreference } = useThemeToggle();
   const iconColor = useThemeColor({}, 'icon') as string;
   const textColor = useThemeColor({}, 'text') as string;
   const inputBackgroundColor = useThemeColor(
@@ -312,12 +314,47 @@ export default function HomeScreen() {
     }
   };
 
+  // Theme toggle helpers
+  const handleThemeToggle = async () => {
+    const cycle: Array<'system' | 'light' | 'dark'> = ['system', 'light', 'dark'];
+    const currentIndex = cycle.indexOf(preference);
+    const nextPreference = cycle[(currentIndex + 1) % cycle.length];
+    await setThemePreference(nextPreference);
+  };
+
+  const getThemeIcon = () => {
+    switch (preference) {
+      case 'light':
+        return 'sun.max.fill';
+      case 'dark':
+        return 'moon.fill';
+      default:
+        return 'circle.lefthalf.filled';
+    }
+  };
+
 
   return (
     <LinearGradient
       colors={(gradientColors && gradientColors.length >= 2 ? gradientColors : ['#ffffff', '#f1f5f9']) as unknown as [string, string, ...string[]]}
       style={styles.root}
     >
+      {/* Theme toggle button - top right corner */}
+      <Pressable
+        onPress={handleThemeToggle}
+        style={({ pressed }) => [
+          styles.themeToggleButton,
+          {
+            top: insets.top + 16,
+            right: Math.max(insets.right, 16),
+            opacity: pressed ? 0.6 : 1,
+          },
+        ]}
+        hitSlop={8}
+      >
+        <IconSymbol name={getThemeIcon()} size={22} color={tintColor} />
+      </Pressable>
+
       <ThemedView style={[styles.mainContainer, {
         paddingTop: insets.top + 16,
         paddingBottom: insets.bottom + 8,
@@ -627,6 +664,16 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+  },
+  themeToggleButton: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(128, 128, 128, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
   },
   mainContainer: {
     flex: 1,

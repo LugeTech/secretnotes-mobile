@@ -1,5 +1,6 @@
 import { useEntranceAnimation } from "@/hooks/use-entrance-animation";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
@@ -39,7 +40,15 @@ export function WelcomeScreen() {
     <ThemedView style={styles.container}>
       <Animated.View style={[styles.content, { opacity: animations[0].opacity, transform: animations[0].transform }]}>
         <View style={styles.headerContainer}>
-          <IconSymbol name="lock.fill" size={48} color={tintColor} />
+          <Image
+            source={
+              Platform.OS === "web"
+                ? { uri: "/og-image.webp" }
+                : require("@/assets/images/icon.png")
+            }
+            style={styles.headerLogo}
+            contentFit="contain"
+          />
           <ThemedText style={styles.heading} type="title">
             SecretNote
           </ThemedText>
@@ -132,6 +141,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
     gap: 8,
+  },
+  headerLogo: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
   },
   heading: {
     fontSize: 32,

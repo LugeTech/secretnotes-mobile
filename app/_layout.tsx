@@ -1,20 +1,20 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { NoteProvider } from '@/components/note/note-provider';
 import { Colors } from '@/constants/theme';
+import { ThemeProvider, useThemeContext } from '@/contexts/theme-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useThemeToggle } from '@/hooks/use-theme-toggle';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
-export default function RootLayout() {
-  const { preference } = useThemeToggle();
+function RootLayoutContent() {
+  const { preference } = useThemeContext();
   const colorScheme = useColorScheme(preference);
 
   const navLightTheme = {
@@ -44,18 +44,26 @@ export default function RootLayout() {
   const navTheme = colorScheme === 'dark' ? navDarkTheme : navLightTheme;
 
   return (
+    <NavThemeProvider value={navTheme}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="facts-for-nerds" options={{ title: 'Facts for Nerds' }} />
+        <Stack.Screen name="COMING_SOON" options={{ title: 'Coming Soon' }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+      </Stack>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    </NavThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <SafeAreaProvider>
-      <NoteProvider>
-        <ThemeProvider value={navTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="facts-for-nerds" options={{ title: 'Facts for Nerds' }} />
-            <Stack.Screen name="COMING_SOON" options={{ title: 'Coming Soon' }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-          </Stack>
-          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        </ThemeProvider>
-      </NoteProvider>
+      <ThemeProvider>
+        <NoteProvider>
+          <RootLayoutContent />
+        </NoteProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

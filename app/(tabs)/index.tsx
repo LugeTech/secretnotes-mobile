@@ -12,7 +12,6 @@ import { ThemedView } from '@/components/themed-view';
 import { AnimatedPressable } from '@/components/ui/animated-pressable';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import ImageAttachmentSection from '@/components/ui/image-attachment-section';
-import { useThemeToggle } from '@/hooks/use-theme-toggle';
 import { InfoModal } from '@/components/ui/info-modal';
 import { NoteSkeleton } from '@/components/ui/skeleton-loader';
 import { WelcomeScreen } from '@/components/welcome-screen';
@@ -20,6 +19,7 @@ import { useAutoSave } from '@/hooks/use-auto-save';
 import { useImage } from '@/hooks/use-image';
 import { useNote } from '@/hooks/use-note';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useThemeToggle } from '@/hooks/use-theme-toggle';
 import { formatFileSize } from '@/utils/format';
 import { getPassphraseColor, getPassphraseStrength, isCommonPhrase } from '@/utils/passphrase';
 import { useRealtimeNote } from '../../hooks/use-realtime-note';
@@ -339,22 +339,6 @@ export default function HomeScreen() {
       colors={gradientColors.length >= 2 ? (gradientColors as [string, string, ...string[]]) : ['#ffffff', '#f8fafc', '#f1f5f9']}
       style={styles.root}
     >
-      {/* Theme toggle button - top left corner */}
-      <Pressable
-        onPress={handleThemeToggle}
-        style={({ pressed }) => [
-          styles.themeToggleButton,
-          {
-            top: insets.top + 8,
-            left: Math.max(insets.left, 16),
-            opacity: pressed ? 0.6 : 1,
-          },
-        ]}
-        hitSlop={8}
-      >
-        <IconSymbol name={getThemeIcon()} size={22} color={tintColor} />
-      </Pressable>
-
       <ThemedView style={[styles.mainContainer, {
         paddingTop: insets.top + 16,
         paddingBottom: insets.bottom + 8,
@@ -522,6 +506,16 @@ export default function HomeScreen() {
                 )}
               </View>
               <View style={styles.saveSection}>
+                {/* Theme toggle button */}
+                <AnimatedPressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Toggle theme"
+                  onPress={handleThemeToggle}
+                  hitSlop={10}
+                  style={styles.reloadButton}
+                >
+                  <IconSymbol name={getThemeIcon()} size={18} color={tintColor} />
+                </AnimatedPressable>
                 <View>
                   <AnimatedPressable
                     accessibilityRole="button"
@@ -664,16 +658,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-  },
-  themeToggleButton: {
-    position: 'absolute',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(128, 128, 128, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
   },
   mainContainer: {
     flex: 1,

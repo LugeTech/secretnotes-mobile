@@ -47,13 +47,8 @@ export function useRealtimeNote(onRemoteUpdate?: () => void) {
       return;
     }
 
-    // Subscribe to all changes in the notes collection
-    // We filter client-side for our specific note
-    const unsubscribePromise = pb.collection('notes').subscribe('*', (e: RecordSubscription<Record<string, unknown>>) => {
-      // Filter to only our note
-      if (e.record?.id !== note.id) {
-        return;
-      }
+    // Subscribe to changes for this specific note only (server-side filtering)
+    const unsubscribePromise = pb.collection('notes').subscribe(note.id, (e: RecordSubscription<Record<string, unknown>>) => {
       
       if (e.record?.updated) {
         const serverUpdated = new Date(e.record.updated as string);
@@ -87,8 +82,8 @@ export function useRealtimeNote(onRemoteUpdate?: () => void) {
       }).catch(() => {
         // Ignore unsubscribe errors
       });
-      // Also try collection-level unsubscribe
-      pb.collection('notes').unsubscribe('*').catch(() => {});
+      // Also try record-level unsubscribe
+      pb.collection('notes').unsubscribe(note.id).catch(() => {});
     };
   }, [note?.id, passphrase, setRemoteUpdateAvailable, setRemoteUpdatedAt]);
 

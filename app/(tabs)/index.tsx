@@ -56,6 +56,10 @@ export default function HomeScreen() {
     'background'
   ) as string;
   const tintColor = useThemeColor({}, 'tint') as string;
+  const placeholderColor = useThemeColor(
+    { light: '#9CA3AF', dark: '#6B7280' },
+    'icon'
+  ) as string;
   const [isThumbnailBlurred, setIsThumbnailBlurred] = useState(true);
   const [infoModal, setInfoModal] = useState<{ visible: boolean; title: string; message: string }>({
     visible: false,
@@ -379,7 +383,7 @@ export default function HomeScreen() {
                 value={passphrase}
                 onChangeText={setPassphrase}
                 placeholder="Enter title"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={placeholderColor}
                 secureTextEntry={!passphraseVisible}
                 autoCorrect={false}
                 autoCapitalize="none"
@@ -533,7 +537,7 @@ export default function HomeScreen() {
                   value={effectiveNoteContent}
                   onChangeText={setNoteContent}
                   placeholder="Start typing your note..."
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={placeholderColor}
                   editable={passphrase.length >= 3}
                   multiline
                   scrollEnabled

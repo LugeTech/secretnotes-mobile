@@ -1,16 +1,51 @@
 import { Image } from 'expo-image';
-import { ScrollView, StyleSheet } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ExternalLink } from '@/components/external-link';
 import { SeoHead } from '@/components/seo-head';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { useThemeToggle } from '@/hooks/use-theme-toggle';
 import { router } from 'expo-router';
 
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function TabTwoScreen() {
+  const { preference, setThemePreference } = useThemeToggle();
+  const tintColor = useThemeColor({}, 'tint');
+  const iconColor = useThemeColor({}, 'icon');
+
+  const handleThemeToggle = async () => {
+    const cycle: Array<'system' | 'light' | 'dark'> = ['system', 'light', 'dark'];
+    const currentIndex = cycle.indexOf(preference);
+    const nextPreference = cycle[(currentIndex + 1) % cycle.length];
+    await setThemePreference(nextPreference);
+  };
+
+  const getThemeIcon = () => {
+    switch (preference) {
+      case 'light':
+        return 'sun.max.fill';
+      case 'dark':
+        return 'moon.fill';
+      default:
+        return 'circle.lefthalf.filled';
+    }
+  };
+
+  const getThemeLabel = () => {
+    switch (preference) {
+      case 'light':
+        return 'Light Mode';
+      case 'dark':
+        return 'Dark Mode';
+      default:
+        return 'System Theme';
+    }
+  };
+
   return (
     <ThemedView style={styles.container}>
       <SeoHead 
@@ -34,6 +69,21 @@ export default function TabTwoScreen() {
             About
           </ThemedText>
         </ThemedView>
+
+        {/* Theme Toggle Button */}
+        <Pressable
+          onPress={handleThemeToggle}
+          style={({ pressed }) => [
+            styles.themeToggleButton,
+            { opacity: pressed ? 0.7 : 1 },
+          ]}
+        >
+          <View style={styles.themeToggleContent}>
+            <IconSymbol name={getThemeIcon()} size={20} color={tintColor} />
+            <ThemedText style={styles.themeToggleText}>{getThemeLabel()}</ThemedText>
+            <IconSymbol name="chevron.right" size={16} color={iconColor} />
+          </View>
+        </Pressable>
 
       <ThemedView 
         style={styles.section}
@@ -151,6 +201,27 @@ const styles = StyleSheet.create({
     gap: 8,
     justifyContent: 'center',
     marginBottom: 8,
+  },
+  themeToggleButton: {
+    marginTop: 16,
+    marginBottom: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(128, 128, 128, 0.2)',
+  },
+  themeToggleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    justifyContent: 'center',
+  },
+  themeToggleText: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+    textAlign: 'center',
   },
    section: {
      gap: 6,

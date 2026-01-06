@@ -7,13 +7,15 @@ import 'react-native-reanimated';
 import { NoteProvider } from '@/components/note/note-provider';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeToggle } from '@/hooks/use-theme-toggle';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { preference } = useThemeToggle();
+  const colorScheme = useColorScheme(preference);
 
   const navLightTheme = {
     ...DefaultTheme,

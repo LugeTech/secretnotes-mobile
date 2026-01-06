@@ -316,21 +316,12 @@ export default function HomeScreen() {
 
   // Theme toggle helpers
   const handleThemeToggle = async () => {
-    const cycle: Array<'system' | 'light' | 'dark'> = ['system', 'light', 'dark'];
-    const currentIndex = cycle.indexOf(preference);
-    const nextPreference = cycle[(currentIndex + 1) % cycle.length];
+    const nextPreference = preference === 'light' ? 'dark' : 'light';
     await setThemePreference(nextPreference);
   };
 
   const getThemeIcon = () => {
-    switch (preference) {
-      case 'light':
-        return 'sun.max.fill';
-      case 'dark':
-        return 'moon.fill';
-      default:
-        return 'circle.lefthalf.filled';
-    }
+    return preference === 'light' ? 'sun.max.fill' : 'moon.fill';
   };
 
 

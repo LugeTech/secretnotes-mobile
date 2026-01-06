@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 const THEME_PREFERENCE_KEY = 'theme_preference';
 
-export type ThemePreference = 'system' | 'light' | 'dark';
+export type ThemePreference = 'light' | 'dark';
 
 interface ThemeContextType {
   preference: ThemePreference;
@@ -14,7 +14,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [preference, setPreference] = useState<ThemePreference>('system');
+  const [preference, setPreference] = useState<ThemePreference>('light');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
@@ -31,7 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const loadPreference = async () => {
     try {
       const saved = await AsyncStorage.getItem(THEME_PREFERENCE_KEY);
-      if (isMountedRef.current && saved && (saved === 'system' || saved === 'light' || saved === 'dark')) {
+      if (isMountedRef.current && saved && (saved === 'light' || saved === 'dark')) {
         setPreference(saved as ThemePreference);
       }
     } catch (error) {
@@ -39,7 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       try {
         if (typeof window !== 'undefined') {
           const saved = localStorage.getItem(THEME_PREFERENCE_KEY);
-          if (isMountedRef.current && saved && (saved === 'system' || saved === 'light' || saved === 'dark')) {
+          if (isMountedRef.current && saved && (saved === 'light' || saved === 'dark')) {
             setPreference(saved as ThemePreference);
           }
         }

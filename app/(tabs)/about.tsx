@@ -1,51 +1,16 @@
 import { Image } from 'expo-image';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
-import { ExternalLink } from '@/components/external-link';
 import { SeoHead } from '@/components/seo-head';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useThemeToggle } from '@/hooks/use-theme-toggle';
 import { router } from 'expo-router';
 
+import { ExternalLink } from '@/components/external-link';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function TabTwoScreen() {
-  const { preference, setThemePreference } = useThemeToggle();
-  const tintColor = useThemeColor({}, 'tint');
-  const iconColor = useThemeColor({}, 'icon');
-
-  const handleThemeToggle = async () => {
-    const cycle: Array<'system' | 'light' | 'dark'> = ['system', 'light', 'dark'];
-    const currentIndex = cycle.indexOf(preference);
-    const nextPreference = cycle[(currentIndex + 1) % cycle.length];
-    await setThemePreference(nextPreference);
-  };
-
-  const getThemeIcon = () => {
-    switch (preference) {
-      case 'light':
-        return 'sun.max.fill';
-      case 'dark':
-        return 'moon.fill';
-      default:
-        return 'circle.lefthalf.filled';
-    }
-  };
-
-  const getThemeLabel = () => {
-    switch (preference) {
-      case 'light':
-        return 'Light Mode';
-      case 'dark':
-        return 'Dark Mode';
-      default:
-        return 'System Theme';
-    }
-  };
-
   return (
     <ThemedView style={styles.container}>
       <SeoHead 
@@ -70,31 +35,16 @@ export default function TabTwoScreen() {
           </ThemedText>
         </ThemedView>
 
-        {/* Theme Toggle Button */}
-        <Pressable
-          onPress={handleThemeToggle}
-          style={({ pressed }) => [
-            styles.themeToggleButton,
-            { opacity: pressed ? 0.7 : 1 },
-          ]}
+        <ThemedView 
+          style={styles.section}
+          lightColor="rgba(230, 220, 240, 0.5)"
+          darkColor="rgba(100, 90, 120, 0.2)"
         >
-          <View style={styles.themeToggleContent}>
-            <IconSymbol name={getThemeIcon()} size={20} color={tintColor} />
-            <ThemedText style={styles.themeToggleText}>{getThemeLabel()}</ThemedText>
-            <IconSymbol name="chevron.right" size={16} color={iconColor} />
-          </View>
-        </Pressable>
-
-      <ThemedView 
-        style={styles.section}
-        lightColor="rgba(230, 220, 240, 0.5)"
-        darkColor="rgba(100, 90, 120, 0.2)"
-      >
-        <ThemedText style={styles.sectionTitle}>When is this useful?</ThemedText>
-        <ThemedText style={styles.bullet}>• Capture thoughts you don’t want tied to an account or synced profile.</ThemedText>
-        <ThemedText style={styles.bullet}>• Share a simple title so two people see the same private space instantly.</ThemedText>
-        <ThemedText style={styles.bullet}>• Spin up “burner” spaces for plans, drafts, or photos you can walk away from by forgetting the title.</ThemedText>
-      </ThemedView>
+          <ThemedText style={styles.sectionTitle}>When is this useful?</ThemedText>
+          <ThemedText style={styles.bullet}>• Capture thoughts you don’t want tied to an account or synced profile.</ThemedText>
+          <ThemedText style={styles.bullet}>• Share a simple title so two people see the same private space instantly.</ThemedText>
+          <ThemedText style={styles.bullet}>• Spin up “burner” spaces for plans, drafts, or photos you can walk away from by forgetting the title.</ThemedText>
+        </ThemedView>
 
       <ThemedView 
         style={styles.section}
@@ -202,76 +152,55 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 8,
   },
-  themeToggleButton: {
-    marginTop: 16,
-    marginBottom: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(128, 128, 128, 0.2)',
+  section: {
+    gap: 6,
+    marginTop: 18,
+    padding: 14,
+    borderRadius: 10,
   },
-  themeToggleContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    justifyContent: 'center',
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    marginBottom: 6,
   },
-  themeToggleText: {
+  bullet: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 3,
+  },
+  link: {
     fontSize: 16,
     fontWeight: '600',
-    flex: 1,
-    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
-   section: {
-     gap: 6,
-     marginTop: 18,
-     padding: 14,
-     borderRadius: 10,
-   },
-   sectionTitle: {
-     fontSize: 17,
-     fontWeight: '600',
-     marginBottom: 6,
-   },
-   bullet: {
-     fontSize: 15,
-     lineHeight: 22,
-     marginBottom: 3,
-   },
-   link: {
-     fontSize: 16,
-     fontWeight: '600',
-     textDecorationLine: 'underline',
-   },
-   footer: {
-     marginTop: 24,
-     marginBottom: 20,
-     alignItems: 'center',
-   },
-   madeBy: {
-     fontSize: 14,
-     opacity: 0.7,
-   },
-   lugetech: {
-     fontSize: 14,
-     fontWeight: '600',
-     textDecorationLine: 'underline',
-   },
-   githubLink: {
+  footer: {
+    marginTop: 24,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  madeBy: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  lugetech: {
+    fontSize: 14,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  githubLink: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginTop: 8,
     paddingVertical: 4,
-   },
-   githubIcon: {
-     marginTop: 2,
-   },
-   githubLinkText: {
+  },
+  githubIcon: {
+    marginTop: 2,
+  },
+  githubLinkText: {
     fontSize: 15,
     color: '#0969DA',
     fontWeight: '500',
     textDecorationLine: 'underline',
-   },
+  },
 });

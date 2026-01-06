@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 interface SaveIndicatorProps {
   isSaving: boolean;
@@ -10,6 +11,8 @@ interface SaveIndicatorProps {
 }
 
 export function SaveIndicator({ isSaving, hasUnsavedChanges, lastSavedAt }: SaveIndicatorProps) {
+  const successColor = useThemeColor({}, 'success') as string;
+  const warningColor = useThemeColor({}, 'warning') as string;
   if (isSaving) {
     return (
       <ThemedView style={styles.container}>
@@ -22,7 +25,7 @@ export function SaveIndicator({ isSaving, hasUnsavedChanges, lastSavedAt }: Save
   if (hasUnsavedChanges) {
     return (
       <ThemedView style={styles.container}>
-        <ThemedText style={styles.unsavedText}>Unsaved changes</ThemedText>
+        <ThemedText style={[styles.unsavedText, { color: warningColor }]}>Unsaved changes</ThemedText>
       </ThemedView>
     );
   }
@@ -34,7 +37,7 @@ export function SaveIndicator({ isSaving, hasUnsavedChanges, lastSavedAt }: Save
     });
     return (
       <ThemedView style={styles.container}>
-        <ThemedText style={styles.savedText}>Saved at {timeStr}</ThemedText>
+        <ThemedText style={[styles.savedText, { color: successColor }]}>Saved at {timeStr}</ThemedText>
       </ThemedView>
     );
   }
@@ -56,11 +59,9 @@ const styles = StyleSheet.create({
   savedText: {
     fontSize: 12,
     opacity: 0.7,
-    color: '#4CAF50',
   },
   unsavedText: {
     fontSize: 12,
     opacity: 0.7,
-    color: '#FF9800',
   },
 });

@@ -5,9 +5,11 @@ import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeToggle } from '@/hooks/use-theme-toggle';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { preference } = useThemeToggle();
+  const colorScheme = useColorScheme(preference);
 
   return (
     <Tabs

@@ -5,12 +5,14 @@
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeToggle } from '@/hooks/use-theme-toggle';
 
 export function useThemeColor<T extends keyof typeof Colors.light & keyof typeof Colors.dark>(
   props: { light?: string; dark?: string },
   colorName: T
 ): T extends 'gradients' ? string[] : string {
-  const theme = useColorScheme() ?? 'light';
+  const { preference } = useThemeToggle();
+  const theme = useColorScheme(preference);
   const colorFromProps = props[theme];
 
   const value = colorFromProps ?? Colors[theme][colorName];

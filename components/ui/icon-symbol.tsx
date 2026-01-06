@@ -24,6 +24,7 @@ const MAPPING = {
   'xmark.circle.fill': 'cancel',
   'plus': 'add',
   'lock.fill': 'lock',
+  'circle.lefthalf.filled': 'brightness-medium',
 } as const satisfies Partial<Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>>;
 
 type IconSymbolName = keyof typeof MAPPING;

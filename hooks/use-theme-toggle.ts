@@ -24,11 +24,14 @@ export function useThemeToggle() {
   const loadPreference = async () => {
     try {
       const saved = await AsyncStorage.getItem(THEME_PREFERENCE_KEY);
+      if (__DEV__) {
+        console.log('[useThemeToggle] Loaded preference from storage:', saved);
+      }
       if (isMountedRef.current && saved && (saved === 'system' || saved === 'light' || saved === 'dark')) {
         setPreference(saved as ThemePreference);
       }
     } catch (error) {
-      console.warn('Failed to load theme preference:', error);
+      console.warn('[useThemeToggle] Failed to load theme preference:', error);
       // Try localStorage fallback for web
       try {
         if (typeof window !== 'undefined') {
@@ -50,7 +53,14 @@ export function useThemeToggle() {
   const setThemePreference = async (newPreference: ThemePreference) => {
     // Prevent rapid taps - don't allow if already saving
     if (isSaving) {
+      if (__DEV__) {
+        console.log('[useThemeToggle] Prevented rapid toggle - already saving');
+      }
       return;
+    }
+
+    if (__DEV__) {
+      console.log('[useThemeToggle] Changing preference:', preference, '->', newPreference);
     }
 
     setIsSaving(true);
@@ -64,8 +74,12 @@ export function useThemeToggle() {
       if (typeof window !== 'undefined') {
         localStorage.setItem(THEME_PREFERENCE_KEY, newPreference);
       }
+
+      if (__DEV__) {
+        console.log('[useThemeToggle] Successfully saved preference:', newPreference);
+      }
     } catch (error) {
-      console.error('Failed to save theme preference:', error);
+      console.error('[useThemeToggle] Failed to save theme preference:', error);
 
       // Revert on error
       try {

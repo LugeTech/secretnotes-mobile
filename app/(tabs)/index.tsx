@@ -264,7 +264,7 @@ export default function HomeScreen() {
     }
   }, [note?.id, imageUri, note?.hasImage, setIsThumbnailBlurred]);
 
-  const gradientColors = useThemeColor({}, 'gradients' as any) as unknown as string[];
+  const gradientColors = useThemeColor({}, 'gradients');
 
   const runReload = (signal?: AbortSignal) => {
     // Cancel any in-flight request before starting a new one
@@ -336,17 +336,17 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient
-      colors={(gradientColors && gradientColors.length >= 2 ? gradientColors : ['#ffffff', '#f1f5f9']) as unknown as [string, string, ...string[]]}
+      colors={gradientColors.length >= 2 ? (gradientColors as [string, string, ...string[]]) : ['#ffffff', '#f8fafc', '#f1f5f9']}
       style={styles.root}
     >
-      {/* Theme toggle button - top right corner */}
+      {/* Theme toggle button - top left corner */}
       <Pressable
         onPress={handleThemeToggle}
         style={({ pressed }) => [
           styles.themeToggleButton,
           {
-            top: insets.top + 16,
-            right: Math.max(insets.right, 16),
+            top: insets.top + 8,
+            left: Math.max(insets.left, 16),
             opacity: pressed ? 0.6 : 1,
           },
         ]}

@@ -10,11 +10,18 @@ export function useColorScheme(override?: ThemePreference) {
   const systemScheme = useRNColorScheme();
 
   if (override === 'light' || override === 'dark') {
+    if (__DEV__) {
+      console.log('[useColorScheme] Using override:', override);
+    }
     return override;
   }
 
   // For 'system' or undefined, return the system preference
-  return systemScheme ?? 'light';
+  const result = systemScheme ?? 'light';
+  if (__DEV__) {
+    console.log('[useColorScheme] Using system preference:', result, '(override:', override, ')');
+  }
+  return result;
 }
 
 // Export the original hook for backward compatibility

@@ -50,10 +50,10 @@ export function WelcomeScreen() {
             contentFit="contain"
           />
           <ThemedText style={styles.heading} type="title">
-            SecretNote
+            Secret Notez
           </ThemedText>
           <ThemedText style={styles.tagline}>
-            Your secrets, your way.
+            Instant, encrypted notes. No signup.
           </ThemedText>
         </View>
 

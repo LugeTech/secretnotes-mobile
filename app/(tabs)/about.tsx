@@ -15,7 +15,7 @@ export default function TabTwoScreen() {
     <ThemedView style={styles.container}>
       <SeoHead 
         title="About & Use Cases" 
-        description="Use Secret Notes for dead drops, puzzles, anonymous chat, public ads, or private storage. Your title determines visibility."
+        description="Use Secret Notez for dead drops, puzzles, anonymous chat, public ads, or private storage. Your title determines visibility."
         url="https://secretnotez.com/about"
         keywords="dead drop, puzzle, riddle, anonymous chat, public board, pastebin, secure storage, encrypted note, private vault"
       />

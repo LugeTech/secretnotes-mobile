@@ -10,9 +10,9 @@ interface SeoHeadProps {
 }
 
 export function SeoHead({ title, description, image, url, keywords }: SeoHeadProps) {
-  const siteName = "Secret Notes";
+  const siteName = "Secret Notez";
   const defaultDescription =
-    "Instant, zero-signup notes. Short titles create public boards; strong titles create private, encrypted vaults with realtime sync—start typing to save.";
+    "Secret Notez: instant, zero-signup, end-to-end encrypted notes. Short titles are public boards; strong titles create private vaults with realtime sync.";
   const defaultImage = "https://secretnotez.com/og-image.webp"; // WebP for smaller file size
   
   const fullTitle = `${title} | ${siteName}`;
@@ -21,6 +21,7 @@ export function SeoHead({ title, description, image, url, keywords }: SeoHeadPro
   const metaKeywords =
     keywords ||
     [
+      "secret notez",
       "secure notes",
       "encrypted notes",
       "realtime notes",
@@ -36,7 +37,7 @@ export function SeoHead({ title, description, image, url, keywords }: SeoHeadPro
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "Secret Notes",
+    "name": "Secret Notez",
     "applicationCategory": "SecurityApplication",
     "operatingSystem": "Web, iOS, Android",
     "offers": {

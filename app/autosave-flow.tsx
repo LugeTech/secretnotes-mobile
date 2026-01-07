@@ -10,7 +10,7 @@ export default function AutosaveFlowScreen() {
     <ThemedView style={styles.container}>
       <SeoHead
         title="Autosave & Realtime Flow"
-        description="How autosave, realtime updates, and conflict handling work in Secret Notes."
+        description="How autosave, realtime updates, and conflict handling work in Secret Notez."
         url="https://secretnotez.com/autosave-flow"
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -24,7 +24,7 @@ export default function AutosaveFlowScreen() {
             Autosave & Realtime Flow
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            How Secret Notes quietly keeps everything up to date
+            How Secret Notez quietly keeps everything up to date
           </ThemedText>
         </ThemedView>
 
@@ -43,7 +43,7 @@ export default function AutosaveFlowScreen() {
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Live updates</ThemedText>
           <ThemedText style={styles.bullet}>
-            • Secret Notes watches for changes while you have a note open.
+            • Secret Notez watches for changes while you have a note open.
           </ThemedText>
           <ThemedText style={styles.bullet}>
             • If something changes elsewhere, we gently let you know.

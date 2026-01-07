@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActionSheetIOS, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActionSheetIOS, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ImageViewer } from '@/components/image/image-viewer';
@@ -338,8 +338,8 @@ export default function HomeScreen() {
         backgroundColor: 'transparent',
       }]}>
         <SeoHead
-          title="Secret Notes — Instant, Encrypted, No Signup"
-          description="Drop a title, start typing. Short titles create public boards; complex titles create private, encrypted vaults with realtime sync and collision-safe autosave. No signup."
+          title="Secret Notez — Instant, Encrypted Notes"
+          description="Enter a title to open an end-to-end encrypted note. Short titles act like public boards; strong titles create private vaults. Zero signup, realtime autosave."
         />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -347,283 +347,290 @@ export default function HomeScreen() {
           keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
           enabled={Platform.OS !== 'web'}
         >
-          {/* Error banner */}
-          {error && (
-            <ThemedView style={[styles.errorBanner, { backgroundColor: errorBannerBackground }]}>
-              <ThemedText style={[styles.errorText, { color: errorTextColor }]}>{error}</ThemedText>
-              <Pressable
-                onPress={() => setError(null)}
-                hitSlop={8}
-                style={styles.errorClose}
-              >
-                <IconSymbol name="xmark.circle.fill" size={20} color={errorTextColor} />
-              </Pressable>
-            </ThemedView>
-          )}
-
-          {/* Compression progress banner */}
-          {compressionProgress && (
-            <ThemedView style={[styles.progressBanner, { backgroundColor: progressBannerBackground }]}>
-              <ActivityIndicator size="small" color={progressTextColor} />
-              <ThemedText style={[styles.progressText, { color: progressTextColor }]}>
-                {compressionProgress}
-              </ThemedText>
-            </ThemedView>
-          )}
-
-          {/* Remote update banner */}
-          {remoteUpdateAvailable && (
-            <ThemedView style={[styles.remoteBanner, { backgroundColor: progressBannerBackground }]}>
-              <ThemedText style={[styles.remoteBannerText, { color: progressTextColor }]}>
-                Someone else edited this note.
-              </ThemedText>
-              <View style={styles.remoteBannerActions}>
-                <Pressable onPress={handleBannerReload} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
-                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Use theirs</ThemedText>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Error banner */}
+            {error && (
+              <ThemedView style={[styles.errorBanner, { backgroundColor: errorBannerBackground }]}>
+                <ThemedText style={[styles.errorText, { color: errorTextColor }]}>{error}</ThemedText>
+                <Pressable
+                  onPress={() => setError(null)}
+                  hitSlop={8}
+                  style={styles.errorClose}
+                >
+                  <IconSymbol name="xmark.circle.fill" size={20} color={errorTextColor} />
                 </Pressable>
-                <Pressable onPress={handleOverwriteRemote} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
-                  <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Keep mine</ThemedText>
-                </Pressable>
-              </View>
-            </ThemedView>
-          )}
+              </ThemedView>
+            )}
 
-          {/* Header: Title Input */}
-          <View style={styles.headerSection}>
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={passphrase}
-                onChangeText={setPassphrase}
-                placeholder="Enter title"
-                placeholderTextColor={placeholderColor}
-                secureTextEntry={!passphraseVisible}
-                autoCorrect={false}
-                autoCapitalize="none"
-                textContentType="password"
-                autoComplete="off"
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => setIsInputFocused(false)}
-                style={[
-                  styles.textInput,
-                  {
-                    color: textColor,
-                    backgroundColor: inputBackgroundColor,
-                    borderColor: isInputFocused ? tintColor : 'transparent',
-                    borderWidth: 2,
-                  },
-                  isInputFocused && styles.textInputFocused,
-                ]}
-              />
-              {/* Icons positioned inside the input */}
-              <View style={styles.inputIconsRow}>
-                {passphrase.length > 0 && (
+            {/* Compression progress banner */}
+            {compressionProgress && (
+              <ThemedView style={[styles.progressBanner, { backgroundColor: progressBannerBackground }]}>
+                <ActivityIndicator size="small" color={progressTextColor} />
+                <ThemedText style={[styles.progressText, { color: progressTextColor }]}>
+                  {compressionProgress}
+                </ThemedText>
+              </ThemedView>
+            )}
+
+            {/* Remote update banner */}
+            {remoteUpdateAvailable && (
+              <ThemedView style={[styles.remoteBanner, { backgroundColor: progressBannerBackground }]}>
+                <ThemedText style={[styles.remoteBannerText, { color: progressTextColor }]}>
+                  Someone else edited this note.
+                </ThemedText>
+                <View style={styles.remoteBannerActions}>
+                  <Pressable onPress={handleBannerReload} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
+                    <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Use theirs</ThemedText>
+                  </Pressable>
+                  <Pressable onPress={handleOverwriteRemote} style={[styles.remoteActionBtn, { borderColor: progressTextColor }]}>
+                    <ThemedText style={[styles.remoteActionText, { color: progressTextColor }]}>Keep mine</ThemedText>
+                  </Pressable>
+                </View>
+              </ThemedView>
+            )}
+
+            {/* Header: Title Input */}
+            <View style={styles.headerSection}>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  value={passphrase}
+                  onChangeText={setPassphrase}
+                  placeholder="Enter title"
+                  placeholderTextColor={placeholderColor}
+                  secureTextEntry={!passphraseVisible}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  textContentType="password"
+                  autoComplete="off"
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setIsInputFocused(false)}
+                  style={[
+                    styles.textInput,
+                    {
+                      color: textColor,
+                      backgroundColor: inputBackgroundColor,
+                      borderColor: isInputFocused ? tintColor : 'transparent',
+                      borderWidth: 2,
+                    },
+                    isInputFocused && styles.textInputFocused,
+                  ]}
+                />
+                {/* Icons positioned inside the input */}
+                <View style={styles.inputIconsRow}>
+                  {passphrase.length > 0 && (
+                    <AnimatedPressable
+                      accessibilityRole="button"
+                      accessibilityLabel="Clear title"
+                      onPress={() => setPassphrase('')}
+                      hitSlop={8}
+                      style={styles.inputIcon}
+                    >
+                      <IconSymbol name="xmark.circle.fill" size={18} color={iconColor} />
+                    </AnimatedPressable>
+                  )}
                   <AnimatedPressable
                     accessibilityRole="button"
-                    accessibilityLabel="Clear title"
-                    onPress={() => setPassphrase('')}
+                    accessibilityLabel={passphraseVisible ? 'Hide title' : 'Show title'}
+                    onPress={() => setPassphraseVisible(!passphraseVisible)}
                     hitSlop={8}
                     style={styles.inputIcon}
                   >
-                    <IconSymbol name="xmark.circle.fill" size={18} color={iconColor} />
+                    <IconSymbol name={passphraseVisible ? 'eye.slash.fill' : 'eye.fill'} size={18} color={iconColor} />
                   </AnimatedPressable>
-                )}
-                <AnimatedPressable
-                  accessibilityRole="button"
-                  accessibilityLabel={passphraseVisible ? 'Hide title' : 'Show title'}
-                  onPress={() => setPassphraseVisible(!passphraseVisible)}
-                  hitSlop={8}
-                  style={styles.inputIcon}
-                >
-                  <IconSymbol name={passphraseVisible ? 'eye.slash.fill' : 'eye.fill'} size={18} color={iconColor} />
-                </AnimatedPressable>
+                </View>
               </View>
-            </View>
 
-            <View style={styles.inputFooter}>
-              <View style={styles.passphraseInfo}>
-                <ThemedText style={styles.charCount}>
-                  {passphrase.length > 0 ? `${passphrase.length} chars` : 'Min 3 chars'}
-                </ThemedText>
-                {passphraseStrength && (
-                  <Animated.View style={{ opacity: strengthFadeAnim, transform: [{ scale: strengthScaleAnim }] }}>
+              <View style={styles.inputFooter}>
+                <View style={styles.passphraseInfo}>
+                  <ThemedText style={styles.charCount}>
+                    {passphrase.length > 0 ? `${passphrase.length} chars` : 'Min 3 chars'}
+                  </ThemedText>
+                  {passphraseStrength && (
+                    <Animated.View style={{ opacity: strengthFadeAnim, transform: [{ scale: strengthScaleAnim }] }}>
+                      <AnimatedPressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Title strength information"
+                        onPress={() => {
+                          console.log('Strength badge clicked!');
+                          setInfoModal({
+                            visible: true,
+                            title: 'Title Strength',
+                            message: 'Your title strength is determined by its length:\n\n• Weak: Less than 6 characters\n• Medium: 6-11 characters\n• Strong: 12 or more characters\n\nLonger titles make your note more secure and harder to guess.',
+                          });
+                        }}
+                        hitSlop={8}
+                        style={styles.strengthIndicator}
+                      >
+                        <View
+                          style={[
+                            styles.strengthDot,
+                            { backgroundColor: getPassphraseColor(passphraseStrength) }
+                          ]}
+                        />
+                        <ThemedText
+                          style={[
+                            styles.strengthText,
+                            { color: getPassphraseColor(passphraseStrength) }
+                          ]}
+                        >
+                          {passphraseStrength}
+                        </ThemedText>
+                      </AnimatedPressable>
+                    </Animated.View>
+                  )}
+                  {isPublicNote && (
                     <AnimatedPressable
                       accessibilityRole="button"
-                      accessibilityLabel="Title strength information"
+                      accessibilityLabel="Public note warning"
                       onPress={() => {
-                        console.log('Strength badge clicked!');
+                        console.log('Public badge clicked!');
                         setInfoModal({
                           visible: true,
-                          title: 'Title Strength',
-                          message: 'Your title strength is determined by its length:\n\n• Weak: Less than 6 characters\n• Medium: 6-11 characters\n• Strong: 12 or more characters\n\nLonger titles make your note more secure and harder to guess.',
+                          title: '⚠️ Public Note Warning',
+                          message: 'Your title uses common words that are easy to guess. Anyone who tries common phrases like "hello", "test", or "password" could access this note.\n\nFor better privacy, use a unique title with uncommon words, numbers, or special characters.',
                         });
                       }}
                       hitSlop={8}
-                      style={styles.strengthIndicator}
+                      style={styles.publicWarningContainer}
                     >
-                      <View
-                        style={[
-                          styles.strengthDot,
-                          { backgroundColor: getPassphraseColor(passphraseStrength) }
-                        ]}
-                      />
-                      <ThemedText
-                        style={[
-                          styles.strengthText,
-                          { color: getPassphraseColor(passphraseStrength) }
-                        ]}
-                      >
-                        {passphraseStrength}
-                      </ThemedText>
+                      <ThemedText style={styles.publicWarning}>⚠️ Public</ThemedText>
                     </AnimatedPressable>
-                  </Animated.View>
-                )}
-                {isPublicNote && (
-                  <AnimatedPressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Public note warning"
-                    onPress={() => {
-                      console.log('Public badge clicked!');
-                      setInfoModal({
-                        visible: true,
-                        title: '⚠️ Public Note Warning',
-                        message: 'Your title uses common words that are easy to guess. Anyone who tries common phrases like "hello", "test", or "password" could access this note.\n\nFor better privacy, use a unique title with uncommon words, numbers, or special characters.',
-                      });
-                    }}
-                    hitSlop={8}
-                    style={styles.publicWarningContainer}
-                  >
-                    <ThemedText style={styles.publicWarning}>⚠️ Public</ThemedText>
-                  </AnimatedPressable>
-                )}
-              </View>
-              <View style={styles.saveSection}>
-                {/* Theme toggle button */}
-                <AnimatedPressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Toggle theme"
-                  onPress={handleThemeToggle}
-                  hitSlop={10}
-                  style={styles.reloadButton}
-                >
-                  <IconSymbol name={getThemeIcon()} size={18} color={tintColor} />
-                </AnimatedPressable>
-                <View>
-                  <AnimatedPressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Reload note"
-                    onPress={handleReloadNote}
-                    disabled={isLoadingNote || passphrase.length < 3}
-                    hitSlop={10}
-                    style={[
-                      styles.reloadButton,
-                      { opacity: isLoadingNote || passphrase.length < 3 ? 0.5 : 1 },
-                    ]}
-                  >
-                    {isLoadingNote ? (
-                      <ActivityIndicator size="small" color={tintColor} />
-                    ) : (
-                      <IconSymbol name="arrow.clockwise" size={18} color={tintColor} />
-                    )}
-                  </AnimatedPressable>
-                  {remoteUpdateAvailable && <View style={[styles.reloadDot, { backgroundColor: tintColor }]} />}
+                  )}
                 </View>
-                {note && (
-                  <SaveIndicator
-                    isSaving={isSavingNote}
-                    hasUnsavedChanges={hasUnsavedChanges}
-                    lastSavedAt={lastSavedAt}
-                  />
-                )}
+                <View style={styles.saveSection}>
+                  {/* Theme toggle button */}
+                  <AnimatedPressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Toggle theme"
+                    onPress={handleThemeToggle}
+                    hitSlop={10}
+                    style={styles.reloadButton}
+                  >
+                    <IconSymbol name={getThemeIcon()} size={18} color={tintColor} />
+                  </AnimatedPressable>
+                  <View>
+                    <AnimatedPressable
+                      accessibilityRole="button"
+                      accessibilityLabel="Reload note"
+                      onPress={handleReloadNote}
+                      disabled={isLoadingNote || passphrase.length < 3}
+                      hitSlop={10}
+                      style={[
+                        styles.reloadButton,
+                        { opacity: isLoadingNote || passphrase.length < 3 ? 0.5 : 1 },
+                      ]}
+                    >
+                      {isLoadingNote ? (
+                        <ActivityIndicator size="small" color={tintColor} />
+                      ) : (
+                        <IconSymbol name="arrow.clockwise" size={18} color={tintColor} />
+                      )}
+                    </AnimatedPressable>
+                    {remoteUpdateAvailable && <View style={[styles.reloadDot, { backgroundColor: tintColor }]} />}
+                  </View>
+                  {note && (
+                    <SaveIndicator
+                      isSaving={isSavingNote}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                      lastSavedAt={lastSavedAt}
+                    />
+                  )}
+                </View>
               </View>
             </View>
-          </View>
 
-          {/* Body: Note Content */}
-          <Animated.View style={[styles.noteSection, { opacity: fadeAnim }]}>
-            {passphrase.length < 3 ? (
-              <WelcomeScreen />
-            ) : isLoadingNote ? (
-              <NoteSkeleton />
-            ) : (
-              <Animated.View
-                style={{
-                  flex: 1,
-                  borderRadius: 12,
-                  backgroundColor: highlightAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['transparent', 'rgba(34, 197, 94, 0.15)'], // Green highlight
-                  }),
-                }}
-              >
-                <TextInput
-                  value={effectiveNoteContent}
-                  onChangeText={setNoteContent}
-                  placeholder="Start typing your note..."
-                  placeholderTextColor={placeholderColor}
-                  editable={passphrase.length >= 3}
-                  multiline
-                  scrollEnabled
-                  style={[styles.noteArea, { color: textColor }]}
-                  textAlignVertical="top"
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                />
-              </Animated.View>
-            )}
-          </Animated.View>
-
-          {/* Footer: Image Attachment */}
-          {passphrase.length >= 3 && !isLoadingNote && (
-            <View style={styles.footerSection}>
-              <ThemedView style={styles.imageContainer}>
-                {note && note.hasImage && imageUri ? (
-                  <ImageAttachmentSection
-                    mode="preview"
-                    appearance="plain"
-                    fileName={isThumbnailBlurred ? 'Image hidden' : 'Image'}
-                    fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
-                    thumbnailUri={imageUri}
-                    onPress={handleImagePress}
-                    onReplace={handleAddOrReplaceImage}
-                    isLoading={isLoadingImage || isUploadingImage}
-                    blur={isThumbnailBlurred}
-                    blurRadius={20}
+            {/* Body: Note Content */}
+            <Animated.View style={[styles.noteSection, { opacity: fadeAnim }]}>
+              {passphrase.length < 3 ? (
+                <WelcomeScreen />
+              ) : isLoadingNote ? (
+                <NoteSkeleton />
+              ) : (
+                <Animated.View
+                  style={{
+                    flex: 1,
+                    borderRadius: 12,
+                    backgroundColor: highlightAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['transparent', 'rgba(34, 197, 94, 0.15)'], // Green highlight
+                    }),
+                  }}
+                >
+                  <TextInput
+                    value={effectiveNoteContent}
+                    onChangeText={setNoteContent}
+                    placeholder="Start typing your note..."
+                    placeholderTextColor={placeholderColor}
+                    editable={passphrase.length >= 3}
+                    multiline
+                    scrollEnabled
+                    style={[styles.noteArea, { color: textColor }]}
+                    textAlignVertical="top"
+                    autoCorrect={false}
+                    autoCapitalize="none"
                   />
-                ) : note ? (
-                  <ImageAttachmentSection
-                    mode="empty"
-                    appearance="dashed"
-                    onPress={handleAddOrReplaceImage}
-                    isLoading={isLoadingImage || isUploadingImage}
-                    style={styles.emptyImageSection}
-                  />
-                ) : null}
+                </Animated.View>
+              )}
+            </Animated.View>
 
-                {/* Blur toggle button - absolute positioned within image container when preview is shown */}
-                {note && note.hasImage && imageUri && (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={isThumbnailBlurred ? 'Show thumbnail' : 'Hide thumbnail'}
-                    onPress={() => setIsThumbnailBlurred(!isThumbnailBlurred)}
-                    hitSlop={8}
-                    style={[
-                      styles.blurToggleBtn,
-                      {
-                        backgroundColor: blurButtonBackground,
-                        borderColor: blurButtonBorderColor,
-                      },
-                    ]}
-                  >
-                    <IconSymbol
-                      name={isThumbnailBlurred ? 'eye.slash.fill' : 'eye.fill'}
-                      size={16}
-                      color={isThumbnailBlurred ? tintColor : iconColor}
+            {/* Footer: Image Attachment */}
+            {passphrase.length >= 3 && !isLoadingNote && (
+              <View style={styles.footerSection}>
+                <ThemedView style={styles.imageContainer}>
+                  {note && note.hasImage && imageUri ? (
+                    <ImageAttachmentSection
+                      mode="preview"
+                      appearance="plain"
+                      fileName={isThumbnailBlurred ? 'Image hidden' : 'Image'}
+                      fileSize={imageMetadata?.fileSize ? formatFileSize(imageMetadata.fileSize) : undefined}
+                      thumbnailUri={imageUri}
+                      onPress={handleImagePress}
+                      onReplace={handleAddOrReplaceImage}
+                      isLoading={isLoadingImage || isUploadingImage}
+                      blur={isThumbnailBlurred}
+                      blurRadius={20}
                     />
-                  </Pressable>
-                )}
-              </ThemedView>
-            </View>
-          )}
+                  ) : note ? (
+                    <ImageAttachmentSection
+                      mode="empty"
+                      appearance="dashed"
+                      onPress={handleAddOrReplaceImage}
+                      isLoading={isLoadingImage || isUploadingImage}
+                      style={styles.emptyImageSection}
+                    />
+                  ) : null}
+
+                  {/* Blur toggle button - absolute positioned within image container when preview is shown */}
+                  {note && note.hasImage && imageUri && (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={isThumbnailBlurred ? 'Show thumbnail' : 'Hide thumbnail'}
+                      onPress={() => setIsThumbnailBlurred(!isThumbnailBlurred)}
+                      hitSlop={8}
+                      style={[
+                        styles.blurToggleBtn,
+                        {
+                          backgroundColor: blurButtonBackground,
+                          borderColor: blurButtonBorderColor,
+                        },
+                      ]}
+                    >
+                      <IconSymbol
+                        name={isThumbnailBlurred ? 'eye.slash.fill' : 'eye.fill'}
+                        size={16}
+                        color={isThumbnailBlurred ? tintColor : iconColor}
+                      />
+                    </Pressable>
+                  )}
+                </ThemedView>
+              </View>
+            )}
+          </ScrollView>
         </KeyboardAvoidingView>
 
         {/* Image Viewer Modal */}
@@ -655,6 +662,10 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
+    gap: 16,
+  },
+  scrollContent: {
+    flexGrow: 1,
     gap: 16,
   },
   errorBanner: {

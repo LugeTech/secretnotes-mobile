@@ -1,17 +1,17 @@
-import React from 'react';
-import {
-  Modal,
-  StyleSheet,
-  View,
-  Pressable,
-  SafeAreaView,
-  Alert,
-} from 'react-native';
-import { Image } from 'expo-image';
-import * as MediaLibrary from 'expo-media-library';
-import { File, Paths } from 'expo-file-system';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { File, Paths } from 'expo-file-system';
+import { Image } from 'expo-image';
+import * as MediaLibrary from 'expo-media-library';
+import React from 'react';
+import {
+    Alert,
+    Modal,
+    Pressable,
+    SafeAreaView,
+    StyleSheet,
+    View,
+} from 'react-native';
 
 interface ImageViewerProps {
   visible: boolean;
@@ -50,12 +50,12 @@ export function ImageViewer({ visible, imageUri, fileName, onClose }: ImageViewe
         const asset = await MediaLibrary.createAssetAsync(tempFile.uri);
         tempFile.delete();
         
-        await MediaLibrary.createAlbumAsync('Secret Notes', asset, false).catch(() => {});
+        await MediaLibrary.createAlbumAsync('Secret Notez', asset, false).catch(() => {});
 
         Alert.alert('Success', 'Image saved to photo library');
       } else {
         const asset = await MediaLibrary.createAssetAsync(imageUri);
-        await MediaLibrary.createAlbumAsync('Secret Notes', asset, false).catch(() => {});
+        await MediaLibrary.createAlbumAsync('Secret Notez', asset, false).catch(() => {});
         
         Alert.alert('Success', 'Image saved to photo library');
       }

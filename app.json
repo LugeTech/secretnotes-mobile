@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Secret Notes",
+    "name": "Secret Notez",
     "slug": "secertnote-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,9 +24,9 @@
     "web": {
       "favicon": "./public/favicon.ico",
       "output": "static",
-      "name": "Secret Notes",
-      "shortName": "SecretNotes",
-      "description": "Instantly create notes by entering a title. Use short titles for public boards or complex ones for private, encrypted vaults. No signup required.",
+      "name": "Secret Notez",
+      "shortName": "SecretNotez",
+      "description": "Secret Notez: instantly open an encrypted note by entering a title. Short titles act like public boards; stronger titles create private vaults with realtime sync—no signup.",
       "themeColor": "#0B1020",
       "display": "standalone",
       "backgroundColor": "#0B1020",

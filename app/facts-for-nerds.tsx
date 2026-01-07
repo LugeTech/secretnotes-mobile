@@ -11,7 +11,7 @@ export default function FactsForNerdsScreen() {
     <ThemedView style={styles.container}>
       <SeoHead 
         title="Technical Security Details" 
-        description="In-depth look at Secret Notes encryption: AES-256-GCM, PBKDF2 key derivation, and SHA-256 hashing."
+        description="In-depth look at Secret Notez encryption: AES-256-GCM, PBKDF2 key derivation, and SHA-256 hashing."
         url="https://secretnotez.com/facts-for-nerds"
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>

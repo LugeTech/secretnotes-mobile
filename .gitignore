@@ -41,3 +41,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Local security findings — must not be published while the fix is undeployed
+ZERO_KNOWLEDGE_GAP.md
+
+# Agent tooling
+.picode/

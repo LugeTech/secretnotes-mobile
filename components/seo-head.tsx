@@ -12,7 +12,7 @@ interface SeoHeadProps {
 export function SeoHead({ title, description, image, url, keywords }: SeoHeadProps) {
   const siteName = "Secret Notez";
   const defaultDescription =
-    "Secret Notez: instant, zero-signup, end-to-end encrypted notes. Short titles are public boards; strong titles create private vaults with realtime sync.";
+    "Secret Notez: instant, zero-signup, encrypted notes. Short titles are public boards; strong titles create private vaults with realtime sync.";
   const defaultImage = "https://secretnotez.com/og-image.webp"; // WebP for smaller file size
   
   const fullTitle = `${title} | ${siteName}`;
@@ -26,7 +26,6 @@ export function SeoHead({ title, description, image, url, keywords }: SeoHeadPro
       "encrypted notes",
       "realtime notes",
       "secret notes",
-      "zero knowledge",
       "private pastebin",
       "anonymous notes",
       "encrypted messaging",

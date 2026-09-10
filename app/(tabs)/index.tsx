@@ -339,7 +339,7 @@ export default function HomeScreen() {
       }]}>
         <SeoHead
           title="Secret Notez — Instant, Encrypted Notes"
-          description="Enter a title to open an end-to-end encrypted note. Short titles act like public boards; strong titles create private vaults. Zero signup, realtime autosave."
+          description="Enter a title to open an encrypted note. Short titles act like public boards; strong titles create private vaults. Zero signup, realtime autosave."
         />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

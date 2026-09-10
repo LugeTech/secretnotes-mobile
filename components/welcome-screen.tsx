@@ -86,7 +86,7 @@ export function WelcomeScreen() {
           <View style={styles.exampleItem}>
             <ThemedText style={styles.examplePassphrase}>"my-secret-journal-2024"</ThemedText>
             <ThemedText style={styles.exampleDescription}>
-              Private thoughts, encrypted and secure
+              Private thoughts, encrypted at rest
             </ThemedText>
           </View>
 

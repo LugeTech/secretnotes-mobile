@@ -43,14 +43,14 @@ export default function FactsForNerdsScreen() {
         <ThemedText style={styles.bullet}>• 8 lowercase letters (~2.1e11 combos): trivial with modern hardware. Don&apos;t.</ThemedText>
         <ThemedText style={styles.bullet}>• 8 chars [a-zA-Z0-9] (~2.8e14 combos): still within reach of serious attackers.</ThemedText>
         <ThemedText style={styles.bullet}>• 12 chars [a-zA-Z0-9] (~4.7e21 combos): beyond practical offline cracking for most real-world attackers.</ThemedText>
-        <ThemedText style={styles.bullet}>• Go longer + symbols and you&apos;re effectively out of reach, especially with PBKDF2 slowing guesses.</ThemedText>
+        <ThemedText style={styles.bullet}>• Go longer + symbols and you&apos;re effectively out of reach of casual guessing.</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>What we (still) see</ThemedText>
-        <ThemedText style={styles.bullet}>• We see: encrypted blobs, hashes, timestamps.</ThemedText>
-        <ThemedText style={styles.bullet}>• We do not see: your raw title or decrypted content.</ThemedText>
-        <ThemedText style={styles.bullet}>• Wrong title = garbage; there&apos;s no admin backdoor to read your private notes.</ThemedText>
+        <ThemedText style={styles.bullet}>• We store: encrypted blobs, a lookup hash, and timestamps.</ThemedText>
+        <ThemedText style={styles.bullet}>• Your title is sent to our server over HTTPS each time you open a note, so the server can derive the key and decrypt it for you.</ThemedText>
+        <ThemedText style={styles.bullet}>• That means our servers can read a note whenever it is opened. This is server-side encryption, not end-to-end.</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>

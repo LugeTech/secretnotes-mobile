@@ -72,10 +72,10 @@ export default function AutosaveFlowScreen() {
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Privacy first</ThemedText>
           <ThemedText style={styles.bullet}>
-            • Your notes are encrypted, and only your device holds the key details.
+            • Your notes are encrypted before they’re stored, and your title is never stored—only a hash of it.
           </ThemedText>
           <ThemedText style={styles.bullet}>
-            • Even our live updates stay sealed until your app unlocks them.
+            • Another device only sees a note if the same title is entered there.
           </ThemedText>
         </ThemedView>
 

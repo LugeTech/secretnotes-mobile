@@ -7,6 +7,22 @@ export interface NoteResponse {
   updated: string;
 }
 
+export interface EncryptedNoteResponse {
+  id: string;
+  ciphertext: string;
+  hasImage: boolean;
+  version: number;
+  created: string;
+  updated: string;
+}
+
+export interface LegacyNoteResponse {
+  ciphertext: string;
+  hasImage: boolean;
+}
+
+export type NoteStatus = 'idle' | 'loading' | 'missing' | 'ready' | 'creating' | 'recovering';
+
 export interface ImageUploadResponse {
   message: string;
   fileName: string;

@@ -48,9 +48,9 @@ export default function FactsForNerdsScreen() {
 
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>What we (still) see</ThemedText>
-        <ThemedText style={styles.bullet}>• We store: encrypted blobs, a lookup hash, and timestamps.</ThemedText>
+        <ThemedText style={styles.bullet}>• We store: client-encrypted blobs, a lookup hash, versions, and timestamps.</ThemedText>
         <ThemedText style={styles.bullet}>• Your title is sent to our server over HTTPS each time you open a note, so the server can derive the key and decrypt it for you.</ThemedText>
-        <ThemedText style={styles.bullet}>• That means our servers can read a note whenever it is opened. This is server-side encryption, not end-to-end.</ThemedText>
+        <ThemedText style={styles.bullet}>• Encryption keys stay on your device. Our servers cannot decrypt your note, image, filename, or media type.</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>

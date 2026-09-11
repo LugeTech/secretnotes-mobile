@@ -16,7 +16,7 @@ Secret Notes uses a unique **Passphrase-Driven** system. You don't create an acc
 
 ## ✨ Key Features
 
-*   **Zero-Knowledge Encryption**: Your notes are encrypted on your device before they are sent to the server. We cannot read your notes even if we wanted to.
+*   **End-to-End Encryption**: Notes, images, filenames, and media types are encrypted on your device. The server receives only a derived lookup token and authenticated ciphertext.
 *   **No Sign-Ups**: No email, no phone number, no username. Just you and your passphrase.
 *   **Image Attachments**: Securely attach images to your notes. They are encrypted too!
 *   **Instant Sharing**: Want to share a note? Just tell someone the passphrase.

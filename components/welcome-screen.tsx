@@ -12,8 +12,6 @@ export function WelcomeScreen() {
   const router = useRouter();
   const isNativeMobile = Platform.OS === "ios" || Platform.OS === "android";
   const tintColor = useThemeColor({}, "tint") as string;
-  const cardBg = useThemeColor({ light: "#ffffff", dark: "#1E2021" }, "background") as string;
-  const shadowColor = useThemeColor({ light: "#000000", dark: "#000000" }, "background") as string;
 
   const animations = useEntranceAnimation(5, 150);
 
@@ -59,7 +57,7 @@ export function WelcomeScreen() {
 
         <Animated.View style={[styles.introContainer, { opacity: animations[1].opacity, transform: animations[1].transform }]}>
           <ThemedText style={styles.introText}>
-            Just pick a word or phrase and start writing. That's your key — anyone with the same passphrase can see that note.
+            Just pick a word or phrase and start writing. That&apos;s your key — anyone with the same passphrase can see that note.
           </ThemedText>
         </Animated.View>
 
@@ -70,28 +68,28 @@ export function WelcomeScreen() {
 
         <Animated.View style={[styles.examplesContainer, { opacity: animations[3].opacity, transform: animations[3].transform }]}>
           <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>"hello"</ThemedText>
+            <ThemedText style={styles.examplePassphrase}>&quot;hello&quot;</ThemedText>
             <ThemedText style={styles.exampleDescription}>
               A quick public note anyone can read
             </ThemedText>
           </View>
 
           <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>"pizza-friday"</ThemedText>
+            <ThemedText style={styles.examplePassphrase}>&quot;pizza-friday&quot;</ThemedText>
             <ThemedText style={styles.exampleDescription}>
               Share lunch plans with your team
             </ThemedText>
           </View>
 
           <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>"my-secret-journal-2024"</ThemedText>
+            <ThemedText style={styles.examplePassphrase}>&quot;my-secret-journal-2024&quot;</ThemedText>
             <ThemedText style={styles.exampleDescription}>
-              Private thoughts, encrypted at rest
+              Private thoughts, encrypted end to end
             </ThemedText>
           </View>
 
           <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>"family-photos"</ThemedText>
+            <ThemedText style={styles.examplePassphrase}>&quot;family-photos&quot;</ThemedText>
             <ThemedText style={styles.exampleDescription}>
               Share pictures with your family
             </ThemedText>

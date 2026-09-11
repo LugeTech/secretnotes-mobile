@@ -1,4 +1,4 @@
-import { ImageUploadResponse, NoteResponse } from '@/types';
+import { ImageUploadResponse, NoteResponse, NoteStatus } from '@/types';
 import React, { createContext, ReactNode, useCallback, useContext, useState } from 'react';
 
 interface NoteContextType {
@@ -8,6 +8,8 @@ interface NoteContextType {
   setPassphraseVisible: (visible: boolean) => void;
   note: NoteResponse | null;
   setNote: (note: NoteResponse | null) => void;
+  noteStatus: NoteStatus;
+  setNoteStatus: (status: NoteStatus) => void;
   noteContent: string;
   setNoteContent: (content: string) => void;
   originalContent: string;
@@ -44,6 +46,7 @@ export function NoteProvider({ children }: { children: ReactNode }) {
   const [passphrase, setPassphrase] = useState('');
   const [passphraseVisible, setPassphraseVisible] = useState(false);
   const [note, setNote] = useState<NoteResponse | null>(null);
+  const [noteStatus, setNoteStatus] = useState<NoteStatus>('idle');
   const [noteContent, setNoteContent] = useState('');
   const [originalContent, setOriginalContent] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -62,6 +65,7 @@ export function NoteProvider({ children }: { children: ReactNode }) {
 
   const clearNote = useCallback(() => {
     setNote(null);
+    setNoteStatus('idle');
     setNoteContent('');
     setOriginalContent('');
     setImageUri(null);
@@ -79,6 +83,8 @@ export function NoteProvider({ children }: { children: ReactNode }) {
     setPassphraseVisible,
     note,
     setNote,
+    noteStatus,
+    setNoteStatus,
     noteContent,
     setNoteContent,
     originalContent,

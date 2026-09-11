@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ImageViewer } from '@/components/image/image-viewer';
 import { useNoteContext } from '@/components/note/note-provider';
+import { NoteAccessChoice } from '@/components/note/note-access-choice';
 import { SaveIndicator } from '@/components/note/save-indicator';
 import { SeoHead } from '@/components/seo-head';
 import { ThemedText } from '@/components/themed-text';
@@ -21,6 +22,7 @@ import { useNote } from '@/hooks/use-note';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useThemeToggle } from '@/hooks/use-theme-toggle';
 import { formatFileSize } from '@/utils/format';
+import { clearCryptoKeys } from '@/utils/crypto';
 import { getPassphraseColor, getPassphraseStrength, isCommonPhrase } from '@/utils/passphrase';
 import { useRealtimeNote } from '../../hooks/use-realtime-note';
 
@@ -83,6 +85,7 @@ export default function HomeScreen() {
     setNoteContent,
     originalContent,
     note,
+    noteStatus,
     imageUri,
     setImageUri,
     imageMetadata,
@@ -103,7 +106,7 @@ export default function HomeScreen() {
     clearNote,
   } = useNoteContext();
 
-  const { loadNote, silentReload, updateNote, forceUpdateNote } = useNote();
+  const { loadNote, silentReload, updateNote, forceUpdateNote, createNote, recoverNote } = useNote();
   const { loadImage, pickAndUploadImage, takeAndUploadPhoto, compressionProgress } = useImage();
 
   const DEFAULT_WELCOME_MESSAGE = 'Welcome to your new secure note!';
@@ -177,6 +180,7 @@ export default function HomeScreen() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    clearCryptoKeys();
     if (passphrase.length < 3) {
       clearNote();
       return;
@@ -203,7 +207,7 @@ export default function HomeScreen() {
         abortControllerRef.current.abort();
       }
     };
-  }, [passphrase, loadNote, clearNote]);
+  }, [passphrase, loadNote, clearNote, setIsLoadingNote]);
 
   // Clear any previously loaded image when switching passphrase or notes
   useEffect(() => {
@@ -550,6 +554,8 @@ export default function HomeScreen() {
                 <WelcomeScreen />
               ) : isLoadingNote ? (
                 <NoteSkeleton />
+              ) : noteStatus === 'missing' || noteStatus === 'creating' || noteStatus === 'recovering' ? (
+                <NoteAccessChoice status={noteStatus} onCreate={createNote} onRecover={recoverNote} />
               ) : (
                 <Animated.View
                   style={{

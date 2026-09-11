@@ -75,10 +75,10 @@ export default function TabTwoScreen() {
          darkColor="rgba(80, 90, 120, 0.2)"
        >
          <ThemedText style={styles.sectionTitle}>Why it’s private by design</ThemedText>
-         <ThemedText style={styles.bullet}>Your note contents are encrypted before they’re stored, and your title is never stored—only a hash.</ThemedText>
+         <ThemedText style={styles.bullet}>Your note, images, filenames, and media types are encrypted on your device before upload.</ThemedText>
          <ThemedText style={styles.bullet}>• AES-256-GCM encryption for notes and images at rest.</ThemedText>
          <ThemedText style={styles.bullet}>• Only a SHA-256 hash of your title is stored—never the title itself.</ThemedText>
-         <ThemedText style={styles.bullet}>• To open a note your title is sent over HTTPS so our server can derive the key, which makes this server-side encryption rather than end-to-end.</ThemedText>
+         <ThemedText style={styles.bullet}>• Your exact title and encryption keys never leave your device. The server receives a one-way lookup token and ciphertext.</ThemedText>
          <ThemedText style={styles.bullet}>• No account, profile, or feed to inspect: without your exact title, your private note stays unreadable.</ThemedText>
          <ThemedText style={styles.bullet}>• Strong, unique titles = private vaults; obvious titles behave like open, shared boards.</ThemedText>
        </ThemedView>

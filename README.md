@@ -38,6 +38,17 @@ Because we don't know who you are and we can't decrypt your data, if you forget 
 
 The web app is a static Expo export served by PM2. The production API URL is embedded during the export, so configure `.env` before building.
 
+From the production checkout, run one PM2 command:
+
+```bash
+pm2 startOrReload ecosystem.config.js --update-env
+pm2 save
+```
+
+The PM2-managed wrapper fetches `origin/subs`, installs the frozen lockfile, exports the web build into `web-build`, and serves it on port `3002`. The process configuration is defined in [ecosystem.config.js](./ecosystem.config.js), and the deployment steps are in [scripts/deploy-and-serve.sh](./scripts/deploy-and-serve.sh).
+
+For a manual recovery on the server, run:
+
 ```bash
 git pull --ff-only origin subs
 pnpm install --frozen-lockfile

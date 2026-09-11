@@ -1,134 +1,120 @@
 import { Image } from 'expo-image';
-import { ScrollView, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
+import { ExternalLink } from '@/components/external-link';
 import { SeoHead } from '@/components/seo-head';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
-import { router } from 'expo-router';
 
-import { ExternalLink } from '@/components/external-link';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-
-export default function TabTwoScreen() {
+export default function AboutScreen() {
   return (
     <ThemedView style={styles.container}>
-      <SeoHead 
-        title="About & Use Cases" 
-        description="Use Secret Notez for dead drops, puzzles, anonymous chat, public ads, or private storage. Your title determines visibility."
+      <SeoHead
+        title="About Secret Notez"
+        description="Learn how Secret Notez handles private notes, shared notes, encrypted images, autosave, and realtime sync without accounts."
         url="https://secretnotez.com/about"
-        keywords="dead drop, puzzle, riddle, anonymous chat, public board, pastebin, secure storage, encrypted note, private vault"
+        keywords="encrypted notes, private notes, secure notes, shared notes, encrypted images, client-side encryption, no signup"
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image
           source={require('@/assets/images/icon.png')}
+          accessibilityLabel="Secret Notez logo"
           style={styles.logo}
           contentFit="contain"
         />
         <ThemedView style={styles.titleContainer}>
-          <ThemedText
-            type="title"
-            style={{
-              fontFamily: Fonts.rounded,
-            }}>
-            About
+          <ThemedText type="title" style={styles.title}>
+            About Secret Notez
+          </ThemedText>
+          <ThemedText style={styles.subtitle}>
+            A small, account-free space for notes you control.
           </ThemedText>
         </ThemedView>
 
-        <ThemedView 
-          style={styles.section}
-          lightColor="rgba(230, 220, 240, 0.5)"
-          darkColor="rgba(100, 90, 120, 0.2)"
-        >
-          <ThemedText style={styles.sectionTitle}>When is this useful?</ThemedText>
-          <ThemedText style={styles.bullet}>• Capture thoughts you don’t want tied to an account or synced profile.</ThemedText>
-          <ThemedText style={styles.bullet}>• Share a simple title so two people see the same private space instantly.</ThemedText>
-          <ThemedText style={styles.bullet}>• Spin up “burner” spaces for plans, drafts, or photos you can walk away from by forgetting the title.</ThemedText>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>What it is</ThemedText>
+          <ThemedText style={styles.body}>
+            Secret Notez opens one note from one exact passphrase. There is no account, profile, or inbox to manage.
+          </ThemedText>
+          <ThemedText style={styles.body}>
+            Anyone with the same passphrase can open the same note. Use a common phrase for an intentional shared board; use a long, unique phrase for private writing.
+          </ThemedText>
         </ThemedView>
 
-      <ThemedView 
-        style={styles.section}
-        lightColor="rgba(220, 240, 230, 0.5)"
-        darkColor="rgba(80, 110, 100, 0.2)"
-      >
-        <ThemedText style={styles.sectionTitle}>What makes it different?</ThemedText>
-        <ThemedText style={styles.bullet}>• Notes aren’t public URLs: only this site/app shows in history, not what you wrote.</ThemedText>
-        <ThemedText style={styles.bullet}>• Your title is the key: change it, and you’re in a completely different space.</ThemedText>
-        <ThemedText style={styles.bullet}>• One title = one focused note + one image: clean, minimal, easy to remember.</ThemedText>
-      </ThemedView>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>How it works</ThemedText>
+          <ThemedText style={styles.bullet}>1. Enter a passphrase with at least 3 characters.</ThemedText>
+          <ThemedText style={styles.bullet}>2. The app derives a lookup token and encryption keys on your device.</ThemedText>
+          <ThemedText style={styles.bullet}>3. Existing notes are downloaded as ciphertext and decrypted locally. New notes must be created explicitly.</ThemedText>
+          <ThemedText style={styles.bullet}>4. Text auto-saves after you pause. Version checks help protect edits made on another device.</ThemedText>
+          <ThemedText style={styles.bullet}>5. You can attach one encrypted image, including its filename and media type.</ThemedText>
+        </ThemedView>
 
-      <ThemedView 
-        style={styles.section}
-        lightColor="rgba(245, 230, 220, 0.5)"
-        darkColor="rgba(120, 100, 90, 0.2)"
-      >
-        <ThemedText style={styles.sectionTitle}>How it works</ThemedText>
-        <ThemedText style={styles.bullet}>• Type a title (3+ characters) to open its note.</ThemedText>
-        <ThemedText style={styles.bullet}>• After you pause, the app fetches or creates that note in the background.</ThemedText>
-        <ThemedText style={styles.bullet}>• Your changes auto-save after short pauses—no manual sync dance.</ThemedText>
-        <ThemedText style={styles.bullet}>• Add one image to keep an important screenshot, document, or photo with the note.</ThemedText>
-       </ThemedView>
- 
-       <ThemedView 
-         style={styles.section}
-         lightColor="rgba(220, 230, 245, 0.5)"
-         darkColor="rgba(80, 90, 120, 0.2)"
-       >
-         <ThemedText style={styles.sectionTitle}>Why it’s private by design</ThemedText>
-         <ThemedText style={styles.bullet}>Your note, images, filenames, and media types are encrypted on your device before upload.</ThemedText>
-         <ThemedText style={styles.bullet}>• AES-256-GCM encryption for notes and images at rest.</ThemedText>
-         <ThemedText style={styles.bullet}>• Only a hash of the derived lookup token is stored for v2 lookup—never the title itself.</ThemedText>
-         <ThemedText style={styles.bullet}>• Your exact title and encryption keys never leave your device. The server receives a one-way lookup token and ciphertext.</ThemedText>
-         <ThemedText style={styles.bullet}>• No account, profile, or feed to inspect: without your exact title, your private note stays unreadable.</ThemedText>
-         <ThemedText style={styles.bullet}>• Strong, unique titles = private vaults; obvious titles behave like open, shared boards.</ThemedText>
-       </ThemedView>
- 
-       <ThemedView 
-        style={styles.section}
-        lightColor="rgba(240, 220, 230, 0.5)"
-        darkColor="rgba(120, 90, 100, 0.2)"
-      >
-        <ThemedText
-          style={styles.link}
-          onPress={() => router.push('/facts-for-nerds')}
-        >
-          Facts for Nerds →
-        </ThemedText>
-      </ThemedView>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>What stays private</ThemedText>
+          <ThemedText style={styles.bullet}>• Your exact passphrase never leaves the current client.</ThemedText>
+          <ThemedText style={styles.bullet}>• Note text, images, filenames, and media types are encrypted before upload.</ThemedText>
+          <ThemedText style={styles.bullet}>• The server cannot decrypt current v2 notes without the passphrase.</ThemedText>
+          <ThemedText style={styles.bullet}>• HTTPS protects the connection while encrypted data travels to the server.</ThemedText>
+        </ThemedView>
 
-      <ThemedView 
-        style={[styles.section, { backgroundColor: 'transparent', marginTop: 6 }]}
-      >
-        <ThemedText
-          style={[styles.link, { opacity: 0.55, fontSize: 14 }]}
-          onPress={() => router.push('/autosave-flow')}
-        >
-          How autosave & realtime work →
-        </ThemedText>
-      </ThemedView>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>What the server can still see</ThemedText>
+          <ThemedText style={styles.bullet}>• A derived lookup request, encrypted payloads, note versions, timestamps, and approximate payload sizes.</ThemedText>
+          <ThemedText style={styles.bullet}>• Normal network information such as an IP address and request timing, depending on hosting and logs.</ThemedText>
+          <ThemedText style={styles.bullet}>• Whether a note exists and whether it has an encrypted image. It does not receive the readable note content.</ThemedText>
+        </ThemedView>
 
-       <ThemedView 
-         style={styles.section}
-         lightColor="rgba(230, 230, 230, 0.5)"
-         darkColor="rgba(50, 50, 50, 0.2)"
-       >
-         <ThemedText style={styles.sectionTitle}>Open Source</ThemedText>
-         <ThemedText style={styles.bullet}>Check out our code on GitHub:</ThemedText>
-         <ExternalLink href="https://github.com/LugeTech/secretnotes-mobile" style={styles.githubLink}>
-           <IconSymbol name="chevron.left.forwardslash.chevron.right" size={18} color="#0969DA" style={styles.githubIcon} />
-           <ThemedText style={styles.githubLinkText}>Mobile App (Frontend)</ThemedText>
-         </ExternalLink>
-         <ExternalLink href="https://github.com/ktappdev/secretnotes-go-backend" style={styles.githubLink}>
-            <IconSymbol name="chevron.left.forwardslash.chevron.right" size={18} color="#0969DA" style={styles.githubIcon} />
-            <ThemedText style={styles.githubLinkText}>Go Server (Backend)</ThemedText>
-         </ExternalLink>
-       </ThemedView>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Important limits</ThemedText>
+          <ThemedText style={styles.bullet}>• There is no password reset. If you lose the passphrase, the current note cannot be recovered.</ThemedText>
+          <ThemedText style={styles.bullet}>• Common or reused phrases are easy to guess and should not protect sensitive information.</ThemedText>
+          <ThemedText style={styles.bullet}>• A compromised device, browser, or deliberately modified client can see content while you are using it.</ThemedText>
+          <ThemedText style={styles.bullet}>• Existing legacy notes have a temporary recovery path. Recovery decrypts on the client and imports a new v2 copy; it does not make the old copy disappear automatically.</ThemedText>
+        </ThemedView>
 
-       <ThemedView style={styles.footer}>
-         <ThemedText style={styles.madeBy}>
-           Made by <ExternalLink href="https://www.lugetech.com"><ThemedText style={styles.lugetech}>Lugetech</ThemedText></ExternalLink>
-         </ThemedText>
-       </ThemedView>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Learn more</ThemedText>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push('/facts-for-nerds')}
+            style={({ pressed }) => [styles.linkRow, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <ThemedText style={styles.link}>Facts for Nerds</ThemedText>
+            <IconSymbol name="chevron.right" size={17} color="#6366F1" />
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push('/autosave-flow')}
+            style={({ pressed }) => [styles.linkRow, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <ThemedText style={styles.link}>Autosave and realtime updates</ThemedText>
+            <IconSymbol name="chevron.right" size={17} color="#6366F1" />
+          </Pressable>
+        </ThemedView>
+
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Open source</ThemedText>
+          <ThemedText style={styles.body}>Read the client and server code:</ThemedText>
+          <ExternalLink href="https://github.com/LugeTech/secretnotes-mobile" style={styles.githubLink}>
+            <IconSymbol name="chevron.left.forwardslash.chevron.right" size={18} color="#6366F1" />
+            <ThemedText style={styles.githubLinkText}>Frontend and mobile app</ThemedText>
+          </ExternalLink>
+          <ExternalLink href="https://github.com/ktappdev/secretnotes-go-backend" style={styles.githubLink}>
+            <IconSymbol name="chevron.left.forwardslash.chevron.right" size={18} color="#6366F1" />
+            <ThemedText style={styles.githubLinkText}>Backend and CLI</ThemedText>
+          </ExternalLink>
+        </ThemedView>
+
+        <ThemedView style={styles.footer}>
+          <ThemedText style={styles.madeBy}>
+            Made by <ExternalLink href="https://www.lugetech.com"><ThemedText style={styles.lugetech}>LugeTech</ThemedText></ExternalLink>
+          </ThemedText>
+        </ThemedView>
       </ScrollView>
     </ThemedView>
   );
@@ -139,69 +125,95 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 32,
+    width: '100%',
+    maxWidth: 760,
+    alignSelf: 'center',
+    padding: 24,
+    paddingBottom: 40,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 96,
+    height: 96,
     alignSelf: 'center',
-    marginBottom: 24,
+    marginBottom: 18,
   },
   titleContainer: {
-    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
-    justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
+  },
+  title: {
+    fontFamily: Fonts.rounded,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    opacity: 0.62,
   },
   section: {
-    gap: 6,
-    marginTop: 18,
-    padding: 14,
-    borderRadius: 10,
+    gap: 8,
+    marginTop: 14,
+    padding: 18,
+    borderRadius: 16,
+    backgroundColor: 'rgba(99, 102, 241, 0.06)',
   },
   sectionTitle: {
     fontSize: 17,
-    fontWeight: '600',
-    marginBottom: 6,
+    lineHeight: 22,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+    marginBottom: 2,
+  },
+  body: {
+    fontSize: 15,
+    lineHeight: 23,
+    opacity: 0.78,
   },
   bullet: {
     fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 3,
+    lineHeight: 23,
+    opacity: 0.78,
+  },
+  linkRow: {
+    minHeight: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
   },
   link: {
-    fontSize: 16,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-  footer: {
-    marginTop: 24,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  madeBy: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  lugetech: {
-    fontSize: 14,
-    fontWeight: '600',
+    flex: 1,
+    fontSize: 15,
+    lineHeight: 21,
+    color: '#6366F1',
+    fontWeight: '700',
     textDecorationLine: 'underline',
   },
   githubLink: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginTop: 8,
-    paddingVertical: 4,
-  },
-  githubIcon: {
-    marginTop: 2,
+    minHeight: 40,
   },
   githubLinkText: {
     fontSize: 15,
-    color: '#0969DA',
-    fontWeight: '500',
+    color: '#6366F1',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  footer: {
+    marginTop: 26,
+    alignItems: 'center',
+  },
+  madeBy: {
+    fontSize: 14,
+    opacity: 0.65,
+  },
+  lugetech: {
+    fontSize: 14,
+    fontWeight: '700',
     textDecorationLine: 'underline',
   },
 });

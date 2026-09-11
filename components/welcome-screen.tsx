@@ -1,238 +1,226 @@
-import { useEntranceAnimation } from "@/hooks/use-entrance-animation";
-import { useThemeColor } from "@/hooks/use-theme-color";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react";
-import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
-import { ThemedText } from "./themed-text";
-import { ThemedView } from "./themed-view";
-import { IconSymbol } from "./ui/icon-symbol";
+import { Fonts } from '@/constants/theme';
+import { useEntranceAnimation } from '@/hooks/use-entrance-animation';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Animated, Platform, Pressable, StyleSheet, View } from 'react-native';
+
+import { ThemedText } from './themed-text';
+import { IconSymbol } from './ui/icon-symbol';
+
+const steps = [
+  ['01', 'Choose a private phrase', 'Use something long and difficult to guess. It becomes your key.'],
+  ['02', 'Write without an account', 'Your note is encrypted on this device before it is saved.'],
+  ['03', 'Return from anywhere', 'Enter the exact same phrase to decrypt your note again.'],
+] as const;
 
 export function WelcomeScreen() {
   const router = useRouter();
-  const isNativeMobile = Platform.OS === "ios" || Platform.OS === "android";
-  const tintColor = useThemeColor({}, "tint") as string;
-
-  const animations = useEntranceAnimation(5, 150);
-
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [pulseAnim]);
+  const isNativeMobile = Platform.OS === 'ios' || Platform.OS === 'android';
+  const tintColor = useThemeColor({}, 'tint') as string;
+  const surfaceColor = useThemeColor(
+    { light: 'rgba(255, 255, 255, 0.70)', dark: 'rgba(27, 30, 36, 0.72)' },
+    'background'
+  ) as string;
+  const borderColor = useThemeColor(
+    { light: 'rgba(44, 55, 78, 0.10)', dark: 'rgba(255, 255, 255, 0.10)' },
+    'background'
+  ) as string;
+  const animations = useEntranceAnimation(4, 100);
 
   return (
-    <ThemedView style={styles.container}>
-      <Animated.View style={[styles.content, { opacity: animations[0].opacity, transform: animations[0].transform }]}>
-        <View style={styles.headerContainer}>
-          <Image
-            source={
-              Platform.OS === "web"
-                ? { uri: "/og-image.webp" }
-                : require("@/assets/images/icon.png")
-            }
-            style={styles.headerLogo}
-            contentFit="contain"
-          />
-          <ThemedText style={styles.heading} type="title">
-            Secret Notez
-          </ThemedText>
-          <ThemedText style={styles.tagline}>
-            Instant, encrypted notes. No signup.
+    <View style={styles.container}>
+      <Animated.View style={[styles.hero, animations[0]]}>
+        <View style={[styles.privacyBadge, { backgroundColor: surfaceColor, borderColor }]}>
+          <View style={[styles.statusDot, { backgroundColor: tintColor }]} />
+          <ThemedText style={styles.privacyBadgeText}>Private by design</ThemedText>
+        </View>
+        <ThemedText style={[styles.heading, { fontFamily: Fonts.rounded }]}>
+          Your words stay yours.
+        </ThemedText>
+        <ThemedText style={styles.introText}>
+          No account, no profile, no readable copy on our server. Your phrase unlocks an encrypted note only on your device.
+        </ThemedText>
+      </Animated.View>
+
+      <Animated.View style={[styles.steps, animations[1]]}>
+        {steps.map(([number, title, copy]) => (
+          <View key={number} style={[styles.step, { borderColor }]}>
+            <ThemedText style={[styles.stepNumber, { color: tintColor, fontFamily: Fonts.mono }]}>
+              {number}
+            </ThemedText>
+            <View style={styles.stepCopy}>
+              <ThemedText style={styles.stepTitle}>{title}</ThemedText>
+              <ThemedText style={styles.stepDescription}>{copy}</ThemedText>
+            </View>
+          </View>
+        ))}
+      </Animated.View>
+
+      <Animated.View
+        style={[
+          styles.securityNote,
+          { backgroundColor: surfaceColor, borderColor },
+          animations[2],
+        ]}
+      >
+        <View style={[styles.securityIcon, { backgroundColor: tintColor }]}>
+          <IconSymbol name="lock.fill" size={15} color="#FFFFFF" />
+        </View>
+        <View style={styles.securityCopy}>
+          <ThemedText style={styles.securityTitle}>There is no password reset</ThemedText>
+          <ThemedText style={styles.securityDescription}>
+            We cannot see or recover your phrase. Save it somewhere safe.
           </ThemedText>
         </View>
-
-        <Animated.View style={[styles.introContainer, { opacity: animations[1].opacity, transform: animations[1].transform }]}>
-          <ThemedText style={styles.introText}>
-            Just pick a word or phrase and start writing. That&apos;s your key — anyone with the same passphrase can see that note.
-          </ThemedText>
-        </Animated.View>
-
-        <Animated.View style={[styles.divider, { opacity: animations[2].opacity }]}>
-          <ThemedText style={styles.dividerText}>Quick examples</ThemedText>
-          <View style={styles.dividerLine} />
-        </Animated.View>
-
-        <Animated.View style={[styles.examplesContainer, { opacity: animations[3].opacity, transform: animations[3].transform }]}>
-          <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>&quot;hello&quot;</ThemedText>
-            <ThemedText style={styles.exampleDescription}>
-              A quick public note anyone can read
-            </ThemedText>
-          </View>
-
-          <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>&quot;pizza-friday&quot;</ThemedText>
-            <ThemedText style={styles.exampleDescription}>
-              Share lunch plans with your team
-            </ThemedText>
-          </View>
-
-          <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>&quot;my-secret-journal-2024&quot;</ThemedText>
-            <ThemedText style={styles.exampleDescription}>
-              Private thoughts, encrypted end to end
-            </ThemedText>
-          </View>
-
-          <View style={styles.exampleItem}>
-            <ThemedText style={styles.examplePassphrase}>&quot;family-photos&quot;</ThemedText>
-            <ThemedText style={styles.exampleDescription}>
-              Share pictures with your family
-            </ThemedText>
-          </View>
-        </Animated.View>
-
-        <Animated.View style={[styles.hintContainer, { opacity: animations[4].opacity, transform: animations[4].transform }]}>
-          <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-            <ThemedText style={styles.hint}>
-              👆 Enter a title above to get started
-            </ThemedText>
-          </Animated.View>
-        </Animated.View>
-
-        {!isNativeMobile && (
-          <View style={styles.linksSection}>
-            <Pressable onPress={() => router.push("/COMING_SOON")} style={[styles.storeButton, { borderColor: tintColor }]}>
-              <IconSymbol name="chevron.right" size={20} color={tintColor} />
-              <ThemedText style={[styles.linkText, { color: tintColor }]}>Download for iOS</ThemedText>
-            </Pressable>
-
-            <Pressable onPress={() => router.push("/COMING_SOON")} style={[styles.storeButton, { borderColor: tintColor }]}>
-              <IconSymbol name="chevron.right" size={20} color={tintColor} />
-              <ThemedText style={[styles.linkText, { color: tintColor }]}>Download for Android</ThemedText>
-            </Pressable>
-          </View>
-        )}
       </Animated.View>
-    </ThemedView>
+
+      {!isNativeMobile && (
+        <Animated.View style={[styles.linksSection, animations[3]]}>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push('/COMING_SOON')}
+            style={({ pressed }) => [styles.storeLink, { opacity: pressed ? 0.55 : 0.75 }]}
+          >
+            <ThemedText style={styles.storeLinkText}>iOS app</ThemedText>
+            <IconSymbol name="chevron.right" size={16} color={tintColor} />
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push('/COMING_SOON')}
+            style={({ pressed }) => [styles.storeLink, { opacity: pressed ? 0.55 : 0.75 }]}
+          >
+            <ThemedText style={styles.storeLinkText}>Android app</ThemedText>
+            <IconSymbol name="chevron.right" size={16} color={tintColor} />
+          </Pressable>
+        </Animated.View>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: 'transparent',
-  },
-  content: {
-    flex: 1,
-    width: "100%",
-    maxWidth: 600,
+    width: '100%',
+    maxWidth: 680,
     alignSelf: 'center',
-    gap: 24,
+    paddingTop: 28,
+    paddingBottom: 18,
+    gap: 28,
   },
-  headerContainer: {
+  hero: {
+    maxWidth: 590,
+    gap: 14,
+  },
+  privacyBadge: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
     gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderRadius: 10,
   },
-  headerLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  privacyBadgeText: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    opacity: 0.66,
   },
   heading: {
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  tagline: {
-    fontSize: 16,
-    opacity: 0.6,
-    textAlign: "center",
-    fontWeight: '500',
-  },
-  introContainer: {
-    paddingHorizontal: 8,
+    maxWidth: 560,
+    fontSize: 42,
+    lineHeight: 45,
+    fontWeight: '700',
+    letterSpacing: -1.6,
   },
   introText: {
+    maxWidth: 570,
     fontSize: 16,
-    lineHeight: 24,
-    textAlign: 'center',
-    opacity: 0.9,
+    lineHeight: 25,
+    opacity: 0.66,
   },
-  divider: {
-    alignItems: 'center',
-    gap: 8,
-    marginVertical: 8,
+  steps: {
+    gap: 0,
   },
-  dividerText: {
-    fontSize: 13,
-    opacity: 0.5,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  dividerLine: {
-    height: 1,
-    width: '100%',
-    opacity: 0.1,
-  },
-  examplesContainer: {
+  step: {
+    flexDirection: 'row',
     gap: 16,
-    paddingHorizontal: 8,
+    paddingVertical: 15,
+    borderTopWidth: 1,
   },
-  exampleItem: {
-    gap: 4,
-  },
-  examplePassphrase: {
-    fontSize: 15,
-    fontWeight: '600',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-  },
-  exampleDescription: {
-    fontSize: 14,
-    opacity: 0.7,
+  stepNumber: {
+    width: 28,
+    fontSize: 11,
     lineHeight: 20,
-    paddingLeft: 4,
+    fontWeight: '700',
   },
-  hintContainer: {
-    alignItems: 'center',
-    marginTop: 12,
+  stepCopy: {
+    flex: 1,
+    gap: 3,
   },
-  hint: {
+  stepTitle: {
     fontSize: 15,
-    textAlign: "center",
-    opacity: 0.8,
-    fontWeight: '600',
+    lineHeight: 20,
+    fontWeight: '700',
+    letterSpacing: -0.15,
+  },
+  stepDescription: {
+    maxWidth: 520,
+    fontSize: 13,
+    lineHeight: 19,
+    opacity: 0.58,
+  },
+  securityNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 13,
+    padding: 14,
+    borderWidth: 1,
+    borderRadius: 16,
+  },
+  securityIcon: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 11,
+  },
+  securityCopy: {
+    flex: 1,
+    gap: 1,
+  },
+  securityTitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '700',
+  },
+  securityDescription: {
+    fontSize: 12,
+    lineHeight: 17,
+    opacity: 0.58,
   },
   linksSection: {
     flexDirection: 'row',
-    gap: 12,
-    justifyContent: 'center',
-    marginTop: 'auto',
-    marginBottom: 20,
+    gap: 24,
   },
-  storeButton: {
-    flex: 1,
-    maxWidth: 180,
+  storeLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    backgroundColor: 'transparent',
+    gap: 2,
+    minHeight: 40,
   },
-  linkText: {
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
+  storeLinkText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

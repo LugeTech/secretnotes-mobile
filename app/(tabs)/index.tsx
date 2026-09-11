@@ -16,6 +16,7 @@ import ImageAttachmentSection from '@/components/ui/image-attachment-section';
 import { InfoModal } from '@/components/ui/info-modal';
 import { NoteSkeleton } from '@/components/ui/skeleton-loader';
 import { WelcomeScreen } from '@/components/welcome-screen';
+import { Fonts } from '@/constants/theme';
 import { useAutoSave } from '@/hooks/use-auto-save';
 import { useImage } from '@/hooks/use-image';
 import { useNote } from '@/hooks/use-note';
@@ -31,10 +32,6 @@ export default function HomeScreen() {
   const { preference, setThemePreference } = useThemeToggle();
   const iconColor = useThemeColor({}, 'icon') as string;
   const textColor = useThemeColor({}, 'text') as string;
-  const inputBackgroundColor = useThemeColor(
-    { light: '#F0F2F5', dark: '#1E1F20' },
-    'background'
-  ) as string;
   const errorBannerBackground = useThemeColor(
     { light: '#FFEBEE', dark: '#3B1212' },
     'background'
@@ -60,6 +57,14 @@ export default function HomeScreen() {
     'background'
   ) as string;
   const tintColor = useThemeColor({}, 'tint') as string;
+  const surfaceColor = useThemeColor(
+    { light: 'rgba(255, 255, 255, 0.78)', dark: 'rgba(27, 30, 36, 0.82)' },
+    'background'
+  ) as string;
+  const borderColor = useThemeColor(
+    { light: 'rgba(44, 55, 78, 0.10)', dark: 'rgba(255, 255, 255, 0.10)' },
+    'background'
+  ) as string;
   const placeholderColor = useThemeColor(
     { light: '#9CA3AF', dark: '#6B7280' },
     'icon'
@@ -175,6 +180,7 @@ export default function HomeScreen() {
 
   const passphraseStrength = passphrase.length >= 3 ? getPassphraseStrength(passphrase) : null;
   const isPublicNote = passphrase.length >= 3 && isCommonPhrase(passphrase);
+  const isPassphraseTooShort = passphrase.length < 3;
 
   // Keep a ref to the current AbortController so we can cancel in-flight requests
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -232,7 +238,7 @@ export default function HomeScreen() {
       duration: 300,
       useNativeDriver: true,
     }).start();
-  }, [passphrase.length < 3, isLoadingNote]);
+  }, [fadeAnim, isLoadingNote, isPassphraseTooShort]);
 
   // Handle strength indicator animations
   useEffect(() => {
@@ -254,7 +260,7 @@ export default function HomeScreen() {
       strengthFadeAnim.setValue(0);
       strengthScaleAnim.setValue(0.9);
     }
-  }, [passphraseStrength]);
+  }, [passphraseStrength, strengthFadeAnim, strengthScaleAnim]);
 
   useEffect(() => {
     if (note?.hasImage && !imageUri) {
@@ -334,8 +340,10 @@ export default function HomeScreen() {
       colors={gradientColors.length >= 2 ? (gradientColors as [string, string, ...string[]]) : ['#ffffff', '#f8fafc', '#f1f5f9']}
       style={styles.root}
     >
+      <View pointerEvents="none" style={[styles.ambientOrb, styles.ambientOrbTop, { backgroundColor: tintColor }]} />
+      <View pointerEvents="none" style={[styles.ambientOrb, styles.ambientOrbBottom, { backgroundColor: tintColor }]} />
       <ThemedView style={[styles.mainContainer, {
-        paddingTop: insets.top + 16,
+        paddingTop: insets.top + 12,
         paddingBottom: insets.bottom + 8,
         paddingLeft: Math.max(insets.left, 16),
         paddingRight: Math.max(insets.right, 16),
@@ -357,6 +365,27 @@ export default function HomeScreen() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
+            <View style={styles.brandBar}>
+              <View style={styles.brandIdentity}>
+                <View style={[styles.brandMark, { backgroundColor: tintColor }]}>
+                  <IconSymbol name="lock.fill" size={15} color="#FFFFFF" />
+                </View>
+                <View>
+                  <ThemedText style={[styles.brandName, { fontFamily: Fonts.rounded }]}>Secret Notez</ThemedText>
+                  <ThemedText style={styles.brandEyebrow}>End-to-end encrypted</ThemedText>
+                </View>
+              </View>
+              <AnimatedPressable
+                accessibilityRole="button"
+                accessibilityLabel="Toggle theme"
+                onPress={handleThemeToggle}
+                hitSlop={10}
+                style={[styles.iconButton, { backgroundColor: surfaceColor, borderColor }]}
+              >
+                <IconSymbol name={getThemeIcon()} size={18} color={textColor} />
+              </AnimatedPressable>
+            </View>
+
             {/* Error banner */}
             {error && (
               <ThemedView style={[styles.errorBanner, { backgroundColor: errorBannerBackground }]}>
@@ -400,7 +429,11 @@ export default function HomeScreen() {
 
             {/* Header: Title Input */}
             <View style={styles.headerSection}>
-              <View style={styles.inputContainer}>
+              <View style={styles.inputHeadingRow}>
+                <ThemedText style={styles.inputLabel}>Open a note</ThemedText>
+                <ThemedText style={styles.inputPrivacy}>Only its lookup token leaves this device</ThemedText>
+              </View>
+              <View style={[styles.inputContainer, { backgroundColor: surfaceColor, borderColor }] }>
                 <TextInput
                   value={passphrase}
                   onChangeText={setPassphrase}
@@ -417,7 +450,7 @@ export default function HomeScreen() {
                     styles.textInput,
                     {
                       color: textColor,
-                      backgroundColor: inputBackgroundColor,
+                      backgroundColor: 'transparent',
                       borderColor: isInputFocused ? tintColor : 'transparent',
                       borderWidth: 2,
                     },
@@ -507,16 +540,6 @@ export default function HomeScreen() {
                   )}
                 </View>
                 <View style={styles.saveSection}>
-                  {/* Theme toggle button */}
-                  <AnimatedPressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Toggle theme"
-                    onPress={handleThemeToggle}
-                    hitSlop={10}
-                    style={styles.reloadButton}
-                  >
-                    <IconSymbol name={getThemeIcon()} size={18} color={tintColor} />
-                  </AnimatedPressable>
                   <View>
                     <AnimatedPressable
                       accessibilityRole="button"
@@ -525,7 +548,8 @@ export default function HomeScreen() {
                       disabled={isLoadingNote || passphrase.length < 3}
                       hitSlop={10}
                       style={[
-                        styles.reloadButton,
+                        styles.iconButton,
+                        { backgroundColor: surfaceColor, borderColor },
                         { opacity: isLoadingNote || passphrase.length < 3 ? 0.5 : 1 },
                       ]}
                     >
@@ -560,11 +584,19 @@ export default function HomeScreen() {
                 <Animated.View
                   style={{
                     flex: 1,
-                    borderRadius: 12,
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    borderColor,
                     backgroundColor: highlightAnim.interpolate({
                       inputRange: [0, 1],
-                      outputRange: ['transparent', 'rgba(34, 197, 94, 0.15)'], // Green highlight
+                      outputRange: [surfaceColor, 'rgba(34, 197, 94, 0.14)'],
                     }),
+                    shadowColor: '#111827',
+                    shadowOffset: { width: 0, height: 14 },
+                    shadowOpacity: 0.06,
+                    shadowRadius: 30,
+                    elevation: 2,
+                    overflow: 'hidden',
                   }}
                 >
                   <TextInput
@@ -662,6 +694,22 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    overflow: 'hidden',
+  },
+  ambientOrb: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    opacity: 0.055,
+  },
+  ambientOrbTop: {
+    top: -150,
+    right: -100,
+  },
+  ambientOrbBottom: {
+    bottom: -180,
+    left: -120,
   },
   mainContainer: {
     flex: 1,
@@ -672,7 +720,42 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    gap: 16,
+    width: '100%',
+    maxWidth: 760,
+    alignSelf: 'center',
+    gap: 14,
+  },
+  brandBar: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brandIdentity: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  brandMark: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandName: {
+    fontSize: 16,
+    lineHeight: 19,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+  brandEyebrow: {
+    fontSize: 10,
+    lineHeight: 13,
+    fontWeight: '600',
+    letterSpacing: 0.65,
+    textTransform: 'uppercase',
+    opacity: 0.5,
   },
   errorBanner: {
     flexDirection: 'row',
@@ -705,12 +788,38 @@ const styles = StyleSheet.create({
   },
   headerSection: {
     flexGrow: 0,
-    gap: 8,
+    gap: 9,
+  },
+  inputHeadingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    gap: 12,
+    paddingHorizontal: 2,
+  },
+  inputLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '700',
+    letterSpacing: -0.1,
+  },
+  inputPrivacy: {
+    flexShrink: 1,
+    fontSize: 11,
+    lineHeight: 15,
+    textAlign: 'right',
+    opacity: 0.48,
   },
   inputContainer: {
     position: 'relative',
-    borderRadius: 12,
+    borderRadius: 18,
+    borderWidth: 1,
     overflow: 'hidden',
+    shadowColor: '#111827',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.06,
+    shadowRadius: 24,
+    elevation: 2,
   },
   inputIconsRow: {
     position: 'absolute',
@@ -725,12 +834,14 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   textInput: {
-    paddingVertical: 16,
-    paddingLeft: 16,
+    minHeight: 58,
+    paddingVertical: 17,
+    paddingLeft: 18,
     paddingRight: 80,
-    fontSize: 16,
-    fontWeight: '500',
-    borderRadius: 12,
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    borderRadius: 18,
     borderWidth: 2,
     borderColor: 'transparent',
   },
@@ -793,15 +904,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  reloadButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+  iconButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
-    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   reloadDot: {
     position: 'absolute',
@@ -839,7 +948,7 @@ const styles = StyleSheet.create({
   },
   noteSection: {
     flex: 1,
-    minHeight: 100,
+    minHeight: 180,
   },
   loadingContainer: {
     flex: 1,
@@ -853,9 +962,10 @@ const styles = StyleSheet.create({
   },
   noteArea: {
     flex: 1,
-    padding: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     fontSize: 17,
-    lineHeight: 26,
+    lineHeight: 27,
     borderWidth: 0,
     outlineStyle: 'none' as any,
   },

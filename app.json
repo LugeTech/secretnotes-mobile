@@ -26,7 +26,7 @@
       "output": "static",
       "name": "Secret Notez",
       "shortName": "SecretNotez",
-      "description": "Secret Notez: instantly open an encrypted note by entering a title. Short titles act like public boards; stronger titles create private vaults with realtime sync—no signup.",
+      "description": "Secret Notez: write private or shared notes with client-side encryption, encrypted image attachments, realtime sync, and no account.",
       "themeColor": "#0B1020",
       "display": "standalone",
       "backgroundColor": "#0B1020",

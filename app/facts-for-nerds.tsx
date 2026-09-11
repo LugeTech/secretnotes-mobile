@@ -11,7 +11,7 @@ export default function FactsForNerdsScreen() {
     <ThemedView style={styles.container}>
       <SeoHead 
         title="Technical Security Details" 
-        description="In-depth look at Secret Notez encryption: AES-256-GCM, PBKDF2 key derivation, and SHA-256 hashing."
+        description="Technical details for Secret Notez v2: local scrypt and HKDF key derivation, AES-256-GCM encryption, authenticated ciphertext, and legacy recovery boundaries."
         url="https://secretnotez.com/facts-for-nerds"
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -34,8 +34,10 @@ export default function FactsForNerdsScreen() {
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Crypto at a glance</ThemedText>
         <ThemedText style={styles.bullet}>• AES-256-GCM for note and image encryption.</ThemedText>
-        <ThemedText style={styles.bullet}>• PBKDF2 (SHA-256, 10,000+ iterations) to derive keys from your title.</ThemedText>
-        <ThemedText style={styles.bullet}>• Only a SHA-256 hash of your title is stored for lookup.</ThemedText>
+        <ThemedText style={styles.bullet}>• scrypt (N=65,536, r=8, p=2) derives a 32-byte root locally from your exact passphrase.</ThemedText>
+        <ThemedText style={styles.bullet}>• HKDF-SHA256 separates lookup, note, image, and image-metadata keys.</ThemedText>
+        <ThemedText style={styles.bullet}>• Fresh secure 12-byte nonces and authenticated version/content labels reject tampering.</ThemedText>
+        <ThemedText style={styles.bullet}>• The server receives a lookup token and ciphertext; it does not receive your passphrase or encryption keys.</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>
@@ -49,8 +51,9 @@ export default function FactsForNerdsScreen() {
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>What we (still) see</ThemedText>
         <ThemedText style={styles.bullet}>• We store: client-encrypted blobs, a lookup hash, versions, and timestamps.</ThemedText>
-        <ThemedText style={styles.bullet}>• Your title is sent to our server over HTTPS each time you open a note, so the server can derive the key and decrypt it for you.</ThemedText>
+        <ThemedText style={styles.bullet}>• Your exact passphrase is never sent. The client derives a lookup token and sends it over HTTPS with encrypted content when needed.</ThemedText>
         <ThemedText style={styles.bullet}>• Encryption keys stay on your device. Our servers cannot decrypt your note, image, filename, or media type.</ThemedText>
+        <ThemedText style={styles.bullet}>• Legacy recovery exists only for migration and uses the old lookup format; it is rate-limited and scheduled for retirement.</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>

@@ -34,5 +34,19 @@ Your passphrase is both your **ID** and your **Encryption Key**.
 **There is no "Forgot Password" button.**
 Because we don't know who you are and we can't decrypt your data, if you forget your passphrase, your note is lost forever.
 
+## Web deployment
+
+The web app is a static Expo export served by PM2. The production API URL is embedded during the export, so configure `.env` before building.
+
+```bash
+git pull --ff-only origin subs
+pnpm install --frozen-lockfile
+pnpm exec expo export --platform web --output-dir web-build
+pm2 startOrReload ecosystem.config.js --update-env
+pm2 save
+```
+
+The PM2 configuration serves `web-build` on port `3002`. Deploy the backend v2 routes before releasing this client. Verify the public site and `/api/health` after restarting.
+
 ---
 *Simple. Secure. Secret.*

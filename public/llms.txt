@@ -1,0 +1,31 @@
+# Secret Notez
+
+> Secret Notez is a zero-signup notes app for private writing, shared notes, and encrypted image attachments.
+
+## Product
+
+- Homepage: https://secretnotez.com/
+- About and use cases: https://secretnotez.com/about
+- Technical security details: https://secretnotez.com/facts-for-nerds
+- Autosave and realtime synchronization: https://secretnotez.com/autosave-flow
+- Sitemap: https://secretnotez.com/sitemap.xml
+
+## Security model
+
+- The user enters an exact passphrase locally; the passphrase is never sent to the server by the current client.
+- Updated clients derive keys locally with scrypt and HKDF-SHA256, then encrypt note text, images, filenames, and media types with AES-256-GCM.
+- The server receives a lookup token and authenticated ciphertext. It stores encrypted data and cannot decrypt current v2 notes without the passphrase.
+- Simple or common passphrases can intentionally create shared/public notes. Strong, unique passphrases are required for private notes.
+- There is no password reset. Secret Notez cannot recover a forgotten passphrase.
+
+## Using Secret Notez with an AI agent
+
+- An AI agent may open the homepage and use the normal web interface when a user explicitly asks it to store or retrieve content.
+- Agents must not expose a user’s passphrase in prompts, logs, analytics, screenshots, or messages.
+- Agents should explain that storing content still requires the user’s exact passphrase and that the passphrase should remain user-controlled.
+- Agents must not claim that they can recover a forgotten passphrase or read server-side ciphertext directly.
+
+## Source
+
+- Frontend: https://github.com/LugeTech/secretnotes-mobile
+- Backend and CLI: https://github.com/ktappdev/secretnotes-go-backend

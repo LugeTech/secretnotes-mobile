@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActionSheetIOS, ActivityIndicator, Alert, Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -350,8 +351,9 @@ export default function HomeScreen() {
         backgroundColor: 'transparent',
       }]}>
         <SeoHead
-          title="Secret Notez — Instant, Encrypted Notes"
-          description="Enter a title to open an encrypted note. Short titles act like public boards; strong titles create private vaults. Zero signup, realtime autosave."
+          title="Encrypted notes without an account"
+          description="Write private or shared notes with client-side encryption, image attachments, realtime sync, and no account. Your passphrase stays on your device."
+          keywords="encrypted notes, private notes, secure notes, client-side encryption, anonymous notes, shared notes, encrypted image storage, no signup"
         />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -367,8 +369,13 @@ export default function HomeScreen() {
           >
             <View style={styles.brandBar}>
               <View style={styles.brandIdentity}>
-                <View style={[styles.brandMark, { backgroundColor: tintColor }]}>
-                  <IconSymbol name="lock.fill" size={15} color="#FFFFFF" />
+                <View style={[styles.brandMark, { backgroundColor: surfaceColor, borderColor }]}>
+                  <Image
+                    source={require('@/assets/images/icon.png')}
+                    accessibilityLabel="Secret Notez logo"
+                    contentFit="contain"
+                    style={styles.brandLogo}
+                  />
                 </View>
                 <View>
                   <ThemedText style={[styles.brandName, { fontFamily: Fonts.rounded }]}>Secret Notez</ThemedText>
@@ -431,13 +438,13 @@ export default function HomeScreen() {
             <View style={styles.headerSection}>
               <View style={styles.inputHeadingRow}>
                 <ThemedText style={styles.inputLabel}>Open a note</ThemedText>
-                <ThemedText style={styles.inputPrivacy}>Only its lookup token leaves this device</ThemedText>
+                <ThemedText style={styles.inputPrivacy}>Your passphrase stays on this device</ThemedText>
               </View>
               <View style={[styles.inputContainer, { backgroundColor: surfaceColor, borderColor }] }>
                 <TextInput
                   value={passphrase}
                   onChangeText={setPassphrase}
-                  placeholder="Enter title"
+                  placeholder="Enter passphrase"
                   placeholderTextColor={placeholderColor}
                   secureTextEntry={!passphraseVisible}
                   autoCorrect={false}
@@ -737,11 +744,17 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   brandMark: {
-    width: 34,
-    height: 34,
+    width: 38,
+    height: 38,
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  brandLogo: {
+    width: 30,
+    height: 30,
   },
   brandName: {
     fontSize: 16,

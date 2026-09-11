@@ -28,6 +28,14 @@ test('round-trips empty and Unicode notes', async () => {
   }
 });
 
+test('matches the frozen Go note ciphertext vector', async () => {
+  const keys = await deriveKeys('correct horse battery staple');
+  assert.equal(
+    encryptText('Cross-client note ✓', keys.noteKey, 'note', nonce),
+    '{"v":2,"n":"AAECAwQFBgcICQoL","c":"raCDT_nEhRPY1BNd2diOtRRKm_PtaHwZ0wJ4EUO9yAMuoHx2BQ"}',
+  );
+});
+
 test('rejects wrong keys and tampering', async () => {
   const keys = await deriveKeys('first title');
   const wrongKeys = await deriveKeys('second title');
@@ -53,4 +61,6 @@ test('API boundary cannot send plaintext credentials or content', async () => {
   assert.doesNotMatch(source, /passphrase/u);
   assert.doesNotMatch(source, /JSON\.stringify\(\{\s*message/u);
   assert.doesNotMatch(source, /form\.append\(['"](?:file_name|content_type)/u);
+  assert.match(source, /form\.append\('image_metadata'/u);
+  assert.match(source, /method: 'POST'[\s\S]*?body: JSON\.stringify\(\{ ciphertext \}\)/u);
 });

@@ -42,11 +42,25 @@ export async function fetchEncryptedNote(lookupToken: string, signal?: AbortSign
   return handleResponse<EncryptedNoteResponse>(response);
 }
 
-export async function saveEncryptedNote(lookupToken: string, ciphertext: string, version?: number): Promise<EncryptedNoteResponse> {
+export async function createEncryptedNote(lookupToken: string, ciphertext: string): Promise<EncryptedNoteResponse> {
+  const response = await fetch(`${API_BASE_URL}/v2/notes`, {
+    method: 'POST',
+    headers: { ...tokenHeaders(lookupToken), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ciphertext }),
+  });
+  return handleResponse<EncryptedNoteResponse>(response);
+}
+
+export async function saveEncryptedNote(
+  lookupToken: string,
+  ciphertext: string,
+  version: number | undefined,
+  force = false,
+): Promise<EncryptedNoteResponse> {
   const response = await fetch(`${API_BASE_URL}/v2/notes`, {
     method: 'PUT',
     headers: { ...tokenHeaders(lookupToken), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ciphertext, ...(version === undefined ? {} : { version }) }),
+    body: JSON.stringify({ ciphertext, ...(force ? { force: true } : { version }) }),
   });
   return handleResponse<EncryptedNoteResponse>(response);
 }
@@ -56,6 +70,7 @@ export async function uploadEncryptedImage(
   encryptedImage: Uint8Array,
   encryptedMetadata: string,
   version: number,
+  signal?: AbortSignal,
 ): Promise<EncryptedNoteResponse> {
   const form = new FormData();
   form.append('image', new Blob([blobBytes(encryptedImage)], { type: 'application/octet-stream' }), 'image.bin');
@@ -65,21 +80,30 @@ export async function uploadEncryptedImage(
     method: 'POST',
     headers: tokenHeaders(lookupToken),
     body: form,
+    signal,
   });
   return handleResponse<EncryptedNoteResponse>(response);
 }
 
-export async function fetchEncryptedImage(lookupToken: string): Promise<{ bytes: Uint8Array; metadata: string }> {
-  const response = await fetch(`${API_BASE_URL}/v2/notes/image`, { headers: tokenHeaders(lookupToken) });
+export async function fetchEncryptedImage(
+  lookupToken: string,
+  signal?: AbortSignal,
+): Promise<{ bytes: Uint8Array; metadata: string }> {
+  const response = await fetch(`${API_BASE_URL}/v2/notes/image`, { headers: tokenHeaders(lookupToken), signal });
   if (!response.ok) await handleResponse<never>(response);
   return { bytes: new Uint8Array(await response.arrayBuffer()), metadata: response.headers.get('X-Encrypted-Metadata') ?? '' };
 }
 
-export async function deleteEncryptedImage(lookupToken: string, version: number): Promise<EncryptedNoteResponse> {
+export async function deleteEncryptedImage(
+  lookupToken: string,
+  version: number,
+  signal?: AbortSignal,
+): Promise<EncryptedNoteResponse> {
   const response = await fetch(`${API_BASE_URL}/v2/notes/image`, {
     method: 'DELETE',
     headers: { ...tokenHeaders(lookupToken), 'Content-Type': 'application/json' },
     body: JSON.stringify({ version }),
+    signal,
   });
   return handleResponse<EncryptedNoteResponse>(response);
 }

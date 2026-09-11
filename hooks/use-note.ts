@@ -1,6 +1,9 @@
 import { useNoteContext } from '@/components/note/note-provider';
 import { EncryptedNoteResponse, NoteResponse } from '@/types';
 import {
+  ApiError,
+  createEncryptedNote,
+  fetchEncryptedImage,
   fetchEncryptedNote,
   fetchLegacyImage,
   fetchLegacyNote,
@@ -25,7 +28,7 @@ import {
   getCryptoKeys,
   lookupTokenHeader,
 } from '@/utils/crypto';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Alert } from 'react-native';
 
 const toNote = (encrypted: EncryptedNoteResponse, message: string): NoteResponse => ({
@@ -47,9 +50,8 @@ export function useNote() {
   const passphraseRef = useRef(passphrase);
   const noteRef = useRef(note);
   const saveQueueRef = useRef(Promise.resolve());
-
-  useEffect(() => { passphraseRef.current = passphrase; }, [passphrase]);
-  useEffect(() => { noteRef.current = note; }, [note]);
+  passphraseRef.current = passphrase;
+  noteRef.current = note;
 
   const applyEncryptedNote = useCallback((encrypted: EncryptedNoteResponse, message: string) => {
     if (passphraseRef.current !== passphrase) return false;
@@ -120,6 +122,7 @@ export function useNote() {
           lookupTokenHeader(keys),
           ciphertext,
           force ? undefined : noteRef.current?.version,
+          force,
         );
         if (applyEncryptedNote(saved, message)) setLastSavedAt(new Date());
       } catch (error) {
@@ -144,8 +147,15 @@ export function useNote() {
     try {
       const keys = await getCryptoKeys(passphrase);
       const ciphertext = await encryptNoteContent('', keys);
-      const created = await saveEncryptedNote(lookupTokenHeader(keys), ciphertext);
-      applyEncryptedNote(created, '');
+      if (passphraseRef.current !== passphrase) return;
+      try {
+        const created = await createEncryptedNote(lookupTokenHeader(keys), ciphertext);
+        applyEncryptedNote(created, '');
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.statusCode !== 409) throw error;
+        const existing = await fetchEncryptedNote(lookupTokenHeader(keys));
+        applyEncryptedNote(existing, decryptNoteContent(existing.ciphertext, keys));
+      }
     } catch (error) {
       if (passphraseRef.current !== passphrase) return;
       const message = handleApiError(error);
@@ -165,28 +175,43 @@ export function useNote() {
       const message = decryptLegacyText(legacy.ciphertext, passphrase);
       const ciphertext = await encryptNoteContent(message, keys);
       let image: { bytes: Uint8Array; metadata: string } | undefined;
+      let recoveredImage: Uint8Array | undefined;
+      let recoveredMetadata: { fileName: string; fileSize: number; contentType: string } | undefined;
       if (legacy.hasImage) {
         const oldImage = await fetchLegacyImage(hash);
         const plaintextImage = decryptLegacyRawBytes(oldImage.bytes, passphrase);
         const fileName = decryptLegacyText(oldImage.fileNameCiphertext, passphrase);
+        recoveredImage = plaintextImage;
+        recoveredMetadata = {
+          fileName,
+          fileSize: plaintextImage.length,
+          contentType: oldImage.contentType,
+        };
         image = {
           bytes: await encryptImageContent(plaintextImage, keys),
-          metadata: await encryptImageMetadata({
-            fileName,
-            fileSize: plaintextImage.length,
-            contentType: oldImage.contentType,
-          }, keys),
+          metadata: await encryptImageMetadata(recoveredMetadata, keys),
         };
       }
-      const imported = await importEncryptedNote(lookupTokenHeader(keys), ciphertext, image);
+      if (passphraseRef.current !== passphrase) return;
+      let importedId: string | undefined;
+      try {
+        const imported = await importEncryptedNote(lookupTokenHeader(keys), ciphertext, image);
+        importedId = imported.id;
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.statusCode !== 409) throw error;
+      }
       const verified = await fetchEncryptedNote(lookupTokenHeader(keys));
-      if (decryptNoteContent(verified.ciphertext, keys) !== message || verified.id !== imported.id) {
+      if (decryptNoteContent(verified.ciphertext, keys) !== message || (importedId && verified.id !== importedId)) {
         throw new Error('Recovered note verification failed');
       }
-      if (image) {
-        const encryptedImage = await import('@/utils/api-client').then(module => module.fetchEncryptedImage(lookupTokenHeader(keys)));
-        decryptImageContent(encryptedImage.bytes, keys);
-        decryptImageMetadata(encryptedImage.metadata, keys);
+      if (recoveredImage && recoveredMetadata) {
+        const encryptedImage = await fetchEncryptedImage(lookupTokenHeader(keys));
+        const verifiedImage = decryptImageContent(encryptedImage.bytes, keys);
+        const verifiedMetadata = decryptImageMetadata(encryptedImage.metadata, keys);
+        if (!equalBytes(verifiedImage, recoveredImage)
+          || JSON.stringify(verifiedMetadata) !== JSON.stringify(recoveredMetadata)) {
+          throw new Error('Recovered image verification failed');
+        }
       }
       applyEncryptedNote(verified, message);
       Alert.alert('Recovery Complete', 'Your existing note is now protected with end-to-end encryption.');
@@ -210,4 +235,8 @@ export function useNote() {
     recoverNote,
     clearNote,
   };
+}
+
+function equalBytes(left: Uint8Array, right: Uint8Array): boolean {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }

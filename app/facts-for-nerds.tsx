@@ -108,25 +108,6 @@ export default function FactsForNerdsScreen() {
         </ThemedView>
 
         <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Legacy note recovery</ThemedText>
-          <ThemedText style={styles.body}>
-            Older notes use the pre-v2 format. Recovery exists to migrate them, not to extend the old design indefinitely.
-          </ThemedText>
-          <ThemedText style={styles.bullet}>
-            • The recovery request uses the old SHA-256 lookup hash through a separate, rate-limited endpoint. That lookup is weaker than v2, especially for weak phrases.
-          </ThemedText>
-          <ThemedText style={styles.bullet}>
-            • The updated client receives the old encrypted content, decrypts it locally, and imports a new v2 copy using the same passphrase.
-          </ThemedText>
-          <ThemedText style={styles.bullet}>
-            • Images are recovered too. The old record remains intact, and the client does not continue writing to the legacy API.
-          </ThemedText>
-          <ThemedText style={styles.body}>
-            The backend caps legacy recovery at March 31, 2027; it may be configured to close earlier. Migrate important legacy notes before then.
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Limits worth knowing</ThemedText>
           <ThemedText style={styles.bullet}>
             • There is no password reset. If the passphrase is lost, the note cannot be recovered.

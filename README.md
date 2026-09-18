@@ -59,5 +59,33 @@ pm2 save
 
 The PM2 configuration serves `web-build` on port `3002`. Deploy the backend v2 routes before releasing this client. Verify the public site and `/api/health` after restarting.
 
+## Native app builds
+
+The iOS and Android apps use Expo Application Services (EAS). Native projects are generated during prebuild; keep the web export workflow above unchanged.
+
+Before the first build, authenticate with EAS and link this app to the Expo project:
+
+```bash
+eas login
+eas init
+```
+
+Set `EXPO_PUBLIC_API_BASE_URL` in the EAS environment used for the build. Then create internal builds for device testing:
+
+```bash
+eas build --platform ios --profile preview
+eas build --platform android --profile preview
+```
+
+After device testing, create production artifacts and submit them from the same EAS project:
+
+```bash
+eas build --platform all --profile production
+eas submit --platform ios --profile production
+eas submit --platform android --profile production
+```
+
+The native app requires iOS 15.1 or later. Camera and photo-library permissions are declared in `app.json`; rebuild after changing native permissions or other Expo plugins.
+
 ---
 *Simple. Secure. Secret.*

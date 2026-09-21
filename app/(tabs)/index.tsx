@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ImageViewer } from '@/components/image/image-viewer';
 import { useNoteContext } from '@/components/note/note-provider';
 import { NoteAccessChoice } from '@/components/note/note-access-choice';
+import { NoteEditor } from '@/components/note/note-editor';
 import { SaveIndicator } from '@/components/note/save-indicator';
 import { SeoHead } from '@/components/seo-head';
 import { ThemedText } from '@/components/themed-text';
@@ -606,18 +607,10 @@ export default function HomeScreen() {
                     overflow: 'hidden',
                   }}
                 >
-                  <TextInput
-                    value={effectiveNoteContent}
+                  <NoteEditor
+                    key={note?.id ?? passphrase}
+                    content={effectiveNoteContent}
                     onChangeText={setNoteContent}
-                    placeholder="Start typing your note..."
-                    placeholderTextColor={placeholderColor}
-                    editable={passphrase.length >= 3}
-                    multiline
-                    scrollEnabled
-                    style={[styles.noteArea, { color: textColor }]}
-                    textAlignVertical="top"
-                    autoCorrect={false}
-                    autoCapitalize="none"
                   />
                 </Animated.View>
               )}
@@ -972,15 +965,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 14,
     opacity: 0.7,
-  },
-  noteArea: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    fontSize: 17,
-    lineHeight: 27,
-    borderWidth: 0,
-    outlineStyle: 'none' as any,
   },
   footerSection: {
     flexGrow: 0,

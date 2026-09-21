@@ -22,7 +22,7 @@ test('derives the frozen cross-client lookup vector', async () => {
 
 test('round-trips empty and Unicode notes', async () => {
   const keys = await deriveKeys('exact Case 🔐');
-  for (const content of ['', 'Hello, 世界 🌎']) {
+  for (const content of ['', 'Hello, 世界 🌎', '# Private note\n\n**Bold** and _italic_ 世界\n\n| A | B |\n| --- | --- |\n| 1 | 2 |\n\n```ts\nconst value = 1;\n```\n\n- [ ] Task\n  trailing spaces  \n']) {
     const encrypted = encryptText(content, keys.noteKey, 'note', nonce);
     assert.equal(decryptText(encrypted, keys.noteKey, 'note'), content);
   }

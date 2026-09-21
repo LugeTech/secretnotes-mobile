@@ -21,6 +21,13 @@ Secret Notes uses a unique **Passphrase-Driven** system. You don't create an acc
 *   **Image Attachments**: Securely attach images to your notes. They are encrypted too!
 *   **Instant Sharing**: Want to share a note? Just tell someone the passphrase.
 *   **Cross-Platform**: Access your notes from iOS, Android, or the Web.
+*   **Markdown Preview**: Switch between Edit and Preview for headings, emphasis, lists, links, quotes, code blocks, and tables. Your original Markdown is encrypted and saved unchanged, including while previewing.
+
+### Writing with Markdown
+
+Notes open in Edit mode. Use `# Heading`, `**bold**`, `*italic*`, `~~strikethrough~~`, lists, blockquotes, and fenced code blocks, then select Preview to read the formatted draft. Ordinary line breaks are preserved. Wide tables and code blocks scroll horizontally. Checklists display read-only markers.
+
+Preview runs locally. Raw HTML is displayed as text, and only explicit HTTP, HTTPS, and email links can be opened. Markdown images display an “Image not loaded” placeholder without making a network request; use the encrypted image attachment for private images. Existing notes need no conversion or migration.
 
 ## 🛡️ Security & Privacy
 

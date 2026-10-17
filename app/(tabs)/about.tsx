@@ -84,7 +84,7 @@ export default function AboutScreen() {
             onPress={() => router.push('/install-cli')}
             style={({ pressed }) => [styles.linkRow, { opacity: pressed ? 0.6 : 1 }]}
           >
-            <ThemedText style={styles.link}>SecretNotes CLI · Coming soon</ThemedText>
+            <ThemedText style={styles.link}>Install the SecretNotes CLI</ThemedText>
             <IconSymbol name="chevron.right" size={17} color="#6366F1" />
           </Pressable>
           <Pressable

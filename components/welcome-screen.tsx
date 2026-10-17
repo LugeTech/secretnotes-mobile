@@ -82,7 +82,7 @@ export function WelcomeScreen() {
             onPress={() => router.push('/install-cli')}
             style={({ pressed }) => [styles.storeLink, { opacity: pressed ? 0.55 : 0.9 }]}
           >
-            <ThemedText style={styles.storeLinkText}>CLI · Coming soon</ThemedText>
+            <ThemedText style={styles.storeLinkText}>Download the CLI</ThemedText>
             <IconSymbol name="chevron.right" size={16} color={tintColor} />
           </Pressable>
           <Pressable

@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Image } from 'expo-image';
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 
@@ -14,6 +15,13 @@ export default function ComingSoonScreen() {
       <SeoHead 
         title="Native Apps Coming Soon" 
         description="Secret Notez for iOS and Android are coming soon. Use the secure web version today."
+        url="https://secretnotez.com/COMING_SOON"
+      />
+      <Image
+        source={require('@/assets/images/icon.png')}
+        accessibilityLabel="Secret Notez logo"
+        contentFit="contain"
+        style={styles.logo}
       />
       <ThemedText style={styles.heading} selectable>
         App Store Links Coming Soon
@@ -47,6 +55,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 8,
+  },
+  logo: {
+    width: 88,
+    height: 88,
+    marginBottom: 4,
   },
   message: {
     fontSize: 16,

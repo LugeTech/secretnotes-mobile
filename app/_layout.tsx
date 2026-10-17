@@ -48,6 +48,7 @@ function RootLayoutContent() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="facts-for-nerds" options={{ title: 'Facts for Nerds' }} />
+        <Stack.Screen name="install-cli" options={{ title: 'SecretNotes CLI' }} />
         <Stack.Screen name="COMING_SOON" options={{ title: 'Coming Soon' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Secret Notes Mobile is an Expo/React Native application providing zero-knowledge encrypted note storage with image attachments. The app uses passphrase-based authentication where passphrases serve dual purposes: identity lookup (via SHA-256 hash) and encryption keys (AES-256-GCM). All encryption/decryption happens server-side.
+Secret Notes Mobile is an Expo/React Native application providing client-side encrypted note storage with image attachments. The app derives a lookup token and separate encryption keys locally from the exact passphrase using scrypt and HKDF-SHA256, then encrypts/decrypts content with AES-256-GCM. The server stores and returns ciphertext; it never receives the passphrase or encryption keys for current v2 notes.
 
 **Backend:** REST API at `https://pb.secretnotez.com/api/secretnotes` (PocketBase backend)
 **Frontend:** Expo Router v6 with TypeScript and React 19
@@ -15,25 +15,25 @@ Secret Notes Mobile is an Expo/React Native application providing zero-knowledge
 ### Starting Development
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start Expo development server
-npx expo start
+pnpm exec expo start
 
 # Start on specific platform
-npx expo start --ios
-npx expo start --android
-npx expo start --web
+pnpm exec expo start --ios
+pnpm exec expo start --android
+pnpm exec expo start --web
 ```
 
 ### Linting
 ```bash
-npm run lint
+pnpm run lint
 ```
 
 ### TypeScript Check
 ```bash
-npx tsc --noEmit
+pnpm exec tsc --noEmit
 ```
 
 ## Environment Configuration
@@ -53,10 +53,11 @@ EXPO_PUBLIC_AUTO_SAVE_DELAY_MS=1000
 
 ### High-Level Flow
 
-1. **Passphrase Entry** → User enters passphrase (min 3 chars)
-2. **Note Load** → GET `/notes` creates new note or retrieves existing
-3. **Auto-Save** → Debounced PUT `/notes` (upsert) saves changes after 1 second of inactivity
-4. **Image Management** → POST/GET/DELETE `/notes/image` for attachments
+1. **Passphrase Entry** → User enters an exact passphrase locally (min 3 chars)
+2. **Key Derivation** → Client derives lookup, note, image, and metadata keys locally
+3. **Note Load** → GET `/v2/notes` uses `X-Lookup-Token` and returns encrypted data without creating records
+4. **Auto-Save** → Debounced POST/PUT `/v2/notes` saves authenticated ciphertext after inactivity
+5. **Image Management** → POST/GET/DELETE `/v2/notes/image` for encrypted attachments
 
 ### Directory Structure
 
@@ -134,38 +135,40 @@ Access state via: `const { passphrase, note, ... } = useNoteContext();`
 Production: `https://pb.secretnotez.com/api/secretnotes` (PocketBase backend)
 
 ### Authentication Pattern
-All requests require passphrase via header:
+Current v2 requests require the derived lookup token via header; never send the passphrase:
 ```typescript
 headers: {
-  'X-Passphrase': userPassphrase,
+  'X-Lookup-Token': derivedLookupToken,
   'Content-Type': 'application/json' // for JSON endpoints
 }
 ```
 
 ### Key Endpoints
 
-**GET /notes** - Load or create note
-- Returns 201 if new, 200 if existing
-- Auto-creates with "Welcome to your new secure note!" message
+**GET /v2/notes** - Load an encrypted note
+- Returns 200 if existing, 404 if missing
+- Never creates records
 - Supports AbortSignal for canceling in-flight requests
 
-**PUT /notes** - Upsert note (recommended for saves)
-- Creates OR updates in single call
-- Handles race conditions better than PATCH
+**POST /v2/notes** - Create an encrypted note
+- Create-only; duplicate creation returns conflict
+
+**PUT /v2/notes** - Update an encrypted note
+- Requires the current version, or explicit force overwrite
 - Used by auto-save
 - Optional `version` parameter for optimistic locking
 - Returns 409 Conflict if version mismatch (concurrent edit detected)
 
-**POST /notes/image** - Upload image (multipart/form-data)
+**POST /v2/notes/image** - Upload encrypted image (multipart/form-data)
 - Max 10 MB file size
 - Replaces existing image
 - Field name must be "image"
 
-**GET /notes/image** - Fetch image
+**GET /v2/notes/image** - Fetch encrypted image
 - Returns binary blob
 - Converted to base64 data URL for React Native display
 
-**DELETE /notes/image** - Remove image
+**DELETE /v2/notes/image** - Remove encrypted image
 
 ### Error Handling
 

@@ -16,11 +16,18 @@ Secret Notes uses a unique **Passphrase-Driven** system. You don't create an acc
 
 ## ✨ Key Features
 
-*   **Zero-Knowledge Encryption**: Your notes are encrypted on your device before they are sent to the server. We cannot read your notes even if we wanted to.
+*   **End-to-End Encryption**: Notes, images, filenames, and media types are encrypted on your device. The server receives only a derived lookup token and authenticated ciphertext.
 *   **No Sign-Ups**: No email, no phone number, no username. Just you and your passphrase.
 *   **Image Attachments**: Securely attach images to your notes. They are encrypted too!
 *   **Instant Sharing**: Want to share a note? Just tell someone the passphrase.
 *   **Cross-Platform**: Access your notes from iOS, Android, or the Web.
+*   **Markdown Preview**: Switch between Edit and Preview for headings, emphasis, lists, links, quotes, code blocks, and tables. Your original Markdown is encrypted and saved unchanged, including while previewing.
+
+### Writing with Markdown
+
+Notes open in Edit mode. Use `# Heading`, `**bold**`, `*italic*`, `~~strikethrough~~`, lists, blockquotes, and fenced code blocks, then select Preview to read the formatted draft. Ordinary line breaks are preserved. Wide tables and code blocks scroll horizontally. Checklists display read-only markers.
+
+Preview runs locally. Raw HTML is displayed as text, and only explicit HTTP, HTTPS, and email links can be opened. Markdown images display an “Image not loaded” placeholder without making a network request; use the encrypted image attachment for private images. Existing notes need no conversion or migration.
 
 ## 🛡️ Security & Privacy
 
@@ -33,6 +40,59 @@ Your passphrase is both your **ID** and your **Encryption Key**.
 ### Important Warning
 **There is no "Forgot Password" button.**
 Because we don't know who you are and we can't decrypt your data, if you forget your passphrase, your note is lost forever.
+
+## Web deployment
+
+The web app is a static Expo export served by PM2. The production API URL is embedded during the export, so configure `.env` before building.
+
+From the production checkout, run one PM2 command:
+
+```bash
+pm2 startOrReload ecosystem.config.js --update-env
+pm2 save
+```
+
+The PM2-managed wrapper fetches `origin/subs`, installs the frozen lockfile, exports the web build into `web-build`, and serves it on port `3002`. The process configuration is defined in [ecosystem.config.js](./ecosystem.config.js), and the deployment steps are in [scripts/deploy-and-serve.sh](./scripts/deploy-and-serve.sh).
+
+For a manual recovery on the server, run:
+
+```bash
+git pull --ff-only origin subs
+pnpm install --frozen-lockfile
+pnpm exec expo export --platform web --output-dir web-build
+pm2 startOrReload ecosystem.config.js --update-env
+pm2 save
+```
+
+The PM2 configuration serves `web-build` on port `3002`. Deploy the backend v2 routes before releasing this client. Verify the public site and `/api/health` after restarting.
+
+## Native app builds
+
+The iOS and Android apps use Expo Application Services (EAS). Native projects are generated during prebuild; keep the web export workflow above unchanged.
+
+Before the first build, authenticate with EAS and link this app to the Expo project:
+
+```bash
+eas login
+eas init
+```
+
+Set `EXPO_PUBLIC_API_BASE_URL` in the EAS environment used for the build. Then create internal builds for device testing:
+
+```bash
+eas build --platform ios --profile preview
+eas build --platform android --profile preview
+```
+
+After device testing, create production artifacts and submit them from the same EAS project:
+
+```bash
+eas build --platform all --profile production
+eas submit --platform ios --profile production
+eas submit --platform android --profile production
+```
+
+The native app requires iOS 15.1 or later. Camera and photo-library permissions are declared in `app.json`; rebuild after changing native permissions or other Expo plugins.
 
 ---
 *Simple. Secure. Secret.*

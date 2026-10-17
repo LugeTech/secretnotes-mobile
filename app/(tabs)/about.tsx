@@ -81,6 +81,14 @@ export default function AboutScreen() {
           <ThemedText style={styles.sectionTitle}>Learn more</ThemedText>
           <Pressable
             accessibilityRole="link"
+            onPress={() => router.push('/install-cli')}
+            style={({ pressed }) => [styles.linkRow, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <ThemedText style={styles.link}>SecretNotes CLI · Coming soon</ThemedText>
+            <IconSymbol name="chevron.right" size={17} color="#6366F1" />
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
             onPress={() => router.push('/facts-for-nerds')}
             style={({ pressed }) => [styles.linkRow, { opacity: pressed ? 0.6 : 1 }]}
           >

@@ -79,6 +79,14 @@ export function WelcomeScreen() {
         <Animated.View style={[styles.linksSection, animations[3]]}>
           <Pressable
             accessibilityRole="link"
+            onPress={() => router.push('/install-cli')}
+            style={({ pressed }) => [styles.storeLink, { opacity: pressed ? 0.55 : 0.9 }]}
+          >
+            <ThemedText style={styles.storeLinkText}>CLI · Coming soon</ThemedText>
+            <IconSymbol name="chevron.right" size={16} color={tintColor} />
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
             onPress={() => router.push('/COMING_SOON')}
             style={({ pressed }) => [styles.storeLink, { opacity: pressed ? 0.55 : 0.75 }]}
           >
@@ -211,6 +219,7 @@ const styles = StyleSheet.create({
   },
   linksSection: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 24,
   },
   storeLink: {
